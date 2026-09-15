@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IRFAN OS</title>
+<script src="/vendor/highcharts/highcharts.js"></script>
+<script src="/vendor/highcharts/highcharts-more.js"></script>
+<script src="/vendor/highcharts/modules/accessibility.js"></script>
+<style>
+[data-theme=dark]{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#1f2436;--card:#161b26;--border:#232b3e;--border2:#2a3348;--text:#e8ecf4;--text2:#9aa3b8;--text3:#5c6680;--shadow:rgba(0,0,0,.5);--topbg:rgba(13,15,20,.96)}
+[data-theme=light]{--bg:#f0f2f7;--bg2:#fff;--bg3:#f5f7fb;--bg4:#eaedf5;--card:#fff;--border:#dde1ed;--border2:#c8cedf;--text:#1a1f2e;--text2:#4a5368;--text3:#8a93aa;--shadow:rgba(0,0,0,.1);--topbg:rgba(240,242,247,.96)}
+:root{--c:#00d4ff;--cd:rgba(0,212,255,.12);--g:#00e5a0;--gd:rgba(0,229,160,.12);--r:#ff4d6a;--rd:rgba(255,77,106,.12);--y:#ffb84d;--yd:rgba(255,184,77,.12);--p:#9b7cff;--pd:rgba(155,124,255,.12);--o:#ff7c4d;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace;--rad:10px;--rsm:6px;--tr:.17s ease}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--topbg);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);height:52px;padding:0 16px;display:flex;align-items:center;gap:10px}
+.logo{font-size:14px;font-weight:800;letter-spacing:.06em;color:var(--c);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.pulse{width:7px;height:7px;background:var(--c);border-radius:50%;box-shadow:0 0 8px var(--c);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.nav{display:flex;gap:2px;overflow-x:auto}
+.nav::-webkit-scrollbar{display:none}
+.ntab{padding:5px 11px;border-radius:var(--rsm);cursor:pointer;color:var(--text3);font-size:11px;font-weight:500;border:none;background:transparent;white-space:nowrap;transition:all var(--tr)}
+.ntab:hover{color:var(--text2);background:var(--bg3)}
+.ntab.on{color:var(--c);background:var(--cd)}
+.tr{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ibtn{width:30px;height:30px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all var(--tr);position:relative}
+.ibtn:hover{border-color:var(--border2);color:var(--text)}
+.ibtn .dot{position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:var(--r);border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+.clk{font-size:11px;color:var(--text3);font-family:var(--mono);background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:4px 9px}
+.pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--g);background:var(--gd);border:1px solid rgba(0,229,160,.2);border-radius:20px;padding:3px 9px}
+.pill::before{content:'';width:5px;height:5px;background:var(--g);border-radius:50%;box-shadow:0 0 5px var(--g)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:210px 1fr;height:calc(100vh - 52px)}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.sidebar{display:none}.nav{display:none}}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.su{padding:6px 8px 10px}
+.su-name{font-size:14px;font-weight:700}
+.su-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.ss{margin:10px 0 3px;padding:0 8px;font-size:10px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
+.si{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--rsm);cursor:pointer;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:500;width:100%;text-align:left;transition:all var(--tr)}
+.si:hover{background:var(--bg3);color:var(--text)}
+.si.on{background:var(--cd);color:var(--c);border:1px solid rgba(0,212,255,.15)}
+.si i{width:15px;text-align:center;font-size:12px}
+.sb{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:10px}
+.sb.r{background:var(--rd);color:var(--r)}
+.sb.g{background:var(--gd);color:var(--g)}
+.dpr{padding:8px 8px 4px}
+.dpl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px}
+.dpb{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.dpf{height:100%;background:linear-gradient(90deg,var(--c),#00a8cc);border-radius:2px;transition:width 1s ease}
+.agrow{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);margin-bottom:3px}
+.agn{font-size:10px;font-weight:800;font-family:var(--mono);color:var(--c)}
+.ags{font-size:9px}
+.ags.on{color:var(--g)}
+.ags.off{color:var(--text3)}
+
+/* MAIN */
+.main{overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.page{display:none;flex-direction:column;gap:14px;animation:fu .2s ease}
+.page.on{display:flex}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* KPI ROW */
+.krow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:700px){.krow{grid-template-columns:repeat(2,1fr)}}
+.kcard{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:14px;position:relative;overflow:hidden;transition:transform var(--tr),border-color var(--tr),box-shadow var(--tr)}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac,var(--c)),transparent)}
+.kcard:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 6px 20px var(--shadow)}
+.klbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:7px}
+.kval{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1}
+.ksub{font-size:11px;color:var(--text3);margin-top:5px;display:flex;align-items:center;gap:4px}
+.ksub.up{color:var(--g)}
+.ksub.dn{color:var(--r)}
+.kico{position:absolute;right:12px;top:12px;font-size:17px;opacity:.15}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:14px}
+@media(max-width:700px){.g2,.g3,.g21,.g12{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;transition:background var(--tr),border-color var(--tr)}
+.ch{padding:12px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:12px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;gap:7px}
+.ct i{color:var(--c);font-size:11px}
+.ca{font-size:11px;color:var(--c);cursor:pointer;opacity:.7}
+.ca:hover{opacity:1}
+.cb{padding:14px}
+
+/* BADGES */
+.badge{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.bc{background:var(--cd);color:var(--c)}
+.bg{background:var(--gd);color:var(--g)}
+.by{background:var(--yd);color:var(--y)}
+.br{background:var(--rd);color:var(--r)}
+.bx{background:var(--bg4);color:var(--text3)}
+
+/* SCHEDULE */
+.schlist{display:flex;flex-direction:column}
+.schitem{display:flex;align-items:stretch;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.schitem:last-child{border-bottom:none}
+.schtime{font-size:11px;font-family:var(--mono);color:var(--text3);width:38px;flex-shrink:0;padding-top:2px}
+.schline{width:2px;background:var(--border);border-radius:2px;flex-shrink:0;position:relative}
+.schdot{width:8px;height:8px;border-radius:50%;position:absolute;top:2px;left:-3px;background:var(--border2);border:2px solid var(--card)}
+.schdot.on{background:var(--c);box-shadow:0 0 8px var(--c)}
+.schdot.done{background:var(--g)}
+.schcon{flex:1}
+.schtit{font-size:12px;font-weight:500;margin-bottom:2px}
+.schcat{font-size:10px;color:var(--text3)}
+
+/* COUNTDOWN */
+.cdrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.cdrow::-webkit-scrollbar{display:none}
+.cdi{flex-shrink:0;padding:10px 14px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);min-width:160px}
+.cdlbl{font-size:10px;color:var(--text3);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdtim{font-size:13px;font-weight:700;font-family:var(--mono)}
+.cdtim.late{color:var(--r)}
+.cdtim.soon{color:var(--y)}
+.cdtim.ok{color:var(--g)}
+.cddate{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* TASKS */
+.tasklist{display:flex;flex-direction:column;gap:5px}
+.taskitem{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all var(--tr)}
+.taskitem:hover{border-color:var(--border2);transform:translateX(2px)}
+.chk{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.chk.done{background:var(--g);border-color:var(--g)}
+.chk.done::after{content:'✓';color:#000;font-size:10px;font-weight:800}
+.ttxt{flex:1;font-size:12px;line-height:1.4}
+.ttxt.done{text-decoration:line-through;color:var(--text3)}
+.tmeta{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.tmeta.late{color:var(--r)}
+
+/* GOALS */
+.glist{display:flex;flex-direction:column;gap:7px}
+.gitem{padding:11px;background:var(--bg3);border-radius:var(--rsm);border:1px solid var(--border);transition:border-color var(--tr)}
+.gitem:hover{border-color:var(--border2)}
+.ghdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.gname{font-size:12px;font-weight:600}
+.gpct{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.pbar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.pfill{height:100%;border-radius:2px;transition:width 1.2s ease}
+.gtags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.gtag{font-size:9px;padding:2px 6px;border-radius:8px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+
+/* HABIT MATRIX */
+.hgrid{display:flex;flex-direction:column;gap:7px}
+.hrow{display:flex;align-items:center;gap:7px}
+.hname{font-size:11px;width:126px;flex-shrink:0;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdays{display:flex;gap:3px;flex:1}
+.hday{width:24px;height:24px;border-radius:4px;border:1px solid var(--border);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);background:var(--bg3)}
+.hday:hover:not(.fut){border-color:var(--c);transform:scale(1.1)}
+.hday.done{background:var(--gd);border-color:var(--g);color:var(--g)}
+.hday.today{border-color:var(--c);box-shadow:0 0 0 1px rgba(0,212,255,.2)}
+.hday.fut{opacity:.25;cursor:default}
+.hpct{font-size:10px;font-family:var(--mono);color:var(--text3);width:28px;text-align:right}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:700px){.kanban{grid-template-columns:1fr 1fr}}
+.kcol{background:var(--bg2);border-radius:var(--rad);border:1px solid var(--border);overflow:hidden}
+.kcolhdr{padding:9px 11px;font-size:11px;font-weight:700;letter-spacing:.05em;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.kcnt{font-size:10px;padding:1px 6px;border-radius:8px;font-family:var(--mono)}
+.kcards{padding:7px;display:flex;flex-direction:column;gap:5px;min-height:50px}
+.kcard{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:9px;cursor:pointer;transition:all var(--tr)}
+.kcard:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 4px 14px var(--shadow)}
+.kctit{font-size:11px;font-weight:500;margin-bottom:5px;line-height:1.4}
+.kcmeta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.kcag{font-size:9px;font-weight:700;font-family:var(--mono);color:var(--c);background:var(--cd);padding:1px 5px;border-radius:3px}
+.kcdue{font-size:9px;font-family:var(--mono);color:var(--text3)}
+.kcdue.late{color:var(--r)}
+
+/* AGENTS */
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.agrid{grid-template-columns:1fr 1fr}}
+.acard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rad);padding:13px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.acard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac,var(--c)),transparent)}
+.acard:hover{border-color:var(--ac,var(--c));box-shadow:0 0 20px rgba(0,212,255,.06)}
+.aname{font-size:13px;font-weight:800;font-family:var(--mono)}
+.arole{font-size:10px;color:var(--text3);margin:5px 0}
+.atask{font-size:11px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.astats{display:flex;gap:12px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.asv{font-weight:700;font-family:var(--mono)}
+
+/* COMPANY CARDS */
+.colist{display:flex;flex-direction:column;gap:4px;max-height:480px;overflow-y:auto}
+.cocard{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);text-decoration:none;transition:border-color var(--tr)}
+.cocard:hover{border-color:var(--border2)}
+.codot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.coinfo{flex:1;min-width:0}
+.coname{font-size:11px;font-weight:700;color:var(--text);margin-bottom:1px}
+.cosub{font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.comatch{font-size:11px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.cotag{font-size:9px;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:600}
+.cotag.hi{background:var(--rd);color:var(--r)}
+.cotag.me{background:var(--yd);color:var(--y)}
+.cotag.lo{background:var(--bg4);color:var(--text3)}
+.cotag.ex{background:var(--cd);color:var(--c)}
+.cofilters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.cofil{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all var(--tr)}
+.cofil.on{background:var(--cd);border-color:var(--c);color:var(--c)}
+
+/* SKILL GAP */
+.sgitem{margin-bottom:9px}
+.sgrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sgname{font-size:11px;color:var(--text2)}
+.sgpri{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600}
+.sgvals{font-size:10px;font-family:var(--mono);color:var(--text3)}
+.sgbar{height:5px;background:var(--bg4);border-radius:3px;position:relative}
+.sgfill{height:100%;border-radius:3px}
+.sgmark{position:absolute;top:-2px;width:2px;height:9px;background:var(--text3);border-radius:1px}
+
+/* JOURNAL */
+.jform{display:flex;flex-direction:column;gap:9px}
+.jlbl{font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
+.jrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mood-row{display:flex;gap:5px;flex-wrap:wrap}
+.mbtn{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:12px;cursor:pointer;transition:all var(--tr)}
+.mbtn.on,.mbtn:hover{border-color:var(--c);color:var(--c);background:var(--cd)}
+.jfield textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:9px;color:var(--text);font-family:var(--font);font-size:12px;resize:vertical;min-height:55px;transition:border-color var(--tr)}
+.jfield textarea:focus{outline:none;border-color:var(--c)}
+select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:6px 9px;color:var(--text);font-size:12px}
+select:focus{outline:none;border-color:var(--c)}
+
+/* WAR ROOM */
+.warchat{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto;padding:2px}
+.wmsg{padding:9px 12px;border-radius:var(--rsm);max-width:88%}
+.wmsg.own{background:var(--cd);border:1px solid rgba(0,212,255,.15);margin-left:auto}
+.wmsg.agt{background:var(--bg3);border:1px solid var(--border)}
+.wfrom{font-size:10px;font-weight:700;font-family:var(--mono);margin-bottom:3px}
+.wmsg.own .wfrom{color:var(--c)}
+.wmsg.agt .wfrom{color:var(--g)}
+.wtxt{font-size:12px;color:var(--text2);line-height:1.5}
+.winput{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:7px 11px;color:var(--text);font-family:var(--font);font-size:12px}
+.winput:focus{outline:none;border-color:var(--c)}
+
+/* TOASTS */
+.toasts{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column-reverse;gap:7px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:var(--rad);background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px var(--shadow);font-size:12px;min-width:190px;pointer-events:all;animation:tin .2s ease}
+@keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+
+/* BUTTONS */
+.btn{padding:7px 13px;border-radius:var(--rsm);border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all var(--tr)}
+.btnc{background:var(--cd);color:var(--c);border:1px solid rgba(0,212,255,.2)}
+.btnc:hover{background:rgba(0,212,255,.2)}
+.btng{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btng:hover{border-color:var(--border2);color:var(--text)}
+.bsm{padding:4px 10px;font-size:11px}
+
+/* MISC */
+.slbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="pulse"></div>IRFAN OS</div>
+  <nav class="nav" id="nav">
+    <button class="ntab on" onclick="nav('today',this)"><i class="fa-solid fa-house-chimney fa-xs"></i> Today</button>
+    <button class="ntab" onclick="nav('goals',this)"><i class="fa-solid fa-bullseye fa-xs"></i> Goals</button>
+    <button class="ntab" onclick="nav('kanban',this)"><i class="fa-solid fa-layer-group fa-xs"></i> Kanban</button>
+    <button class="ntab" onclick="nav('agents',this)"><i class="fa-solid fa-robot fa-xs"></i> AI Team</button>
+    <button class="ntab" onclick="nav('career',this)"><i class="fa-solid fa-rocket fa-xs"></i> Career</button>
+    <button class="ntab" onclick="nav('opps',this)">&#128225; Opportunities</button>
+    <button class="ntab" onclick="nav('journal',this)"><i class="fa-solid fa-pen-nib fa-xs"></i> Journal</button>
+    <button class="ntab" onclick="nav('analytics',this)"><i class="fa-solid fa-chart-mixed fa-xs"></i> Analytics</button>
+    <button class="ntab" onclick="nav('warroom',this)"><i class="fa-solid fa-shield-halved fa-xs"></i> War Room</button>
+  </nav>
+  <div class="tr">
+    <span class="clk" id="clk">Sab 12 Sep</span>
+    <span class="pill">ATLAS ONLINE</span>
+    <button class="ibtn" id="notifBtn" onclick="toggleNotif()" title="Notifikasi"><i class="fa-solid fa-bell fa-xs"></i><span class="dot">3</span></button>
+    <button class="ibtn" onclick="toggleTheme()" id="themeBtn" title="Theme">&#9728;</button>
+  </div>
+</div>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="su"><div class="su-name">Irfan Alawi</div><div class="su-sub">Geophysics S2 · Bandung</div></div>
+  <div class="dpr">
+    <div class="dpl"><span>Progres hari ini</span><span id="dpct">0%</span></div>
+    <div class="dpb"><div class="dpf" id="dpf" style="width:0%"></div></div>
+  </div>
+  <button class="si on" onclick="nav('today',null)"><i class="fa-solid fa-house-chimney"></i> Today</button>
+  <div class="ss">PLAN</div>
+  <button class="si" onclick="nav('goals',null)"><i class="fa-solid fa-bullseye"></i> Vision &amp; Goals</button>
+  <button class="si" onclick="nav('kanban',null)"><i class="fa-solid fa-layer-group"></i> Kanban Board <span class="sb r">33</span></button>
+  <div class="ss">INTELLIGENCE</div>
+  <button class="si" onclick="nav('career',null)"><i class="fa-solid fa-rocket"></i> Career O&amp;G <span class="sb g">NEW</span></button>
+  <button class="si" onclick="nav('opps',null)"><i class="fa-solid fa-satellite-dish"></i> Opportunities <span class="sb g">49</span></button>
+  <button class="si" onclick="nav('journal',null)"><i class="fa-solid fa-pen-nib"></i> Journal</button>
+  <button class="si" onclick="nav('analytics',null)"><i class="fa-solid fa-chart-mixed"></i> Analytics</button>
+  <div class="ss">OPERATIONS</div>
+  <button class="si" onclick="nav('agents',null)"><i class="fa-solid fa-robot"></i> AI Team</button>
+  <button class="si" onclick="nav('warroom',null)"><i class="fa-solid fa-shield-halved"></i> War Room</button>
+  <div class="ss" style="margin-top:10px">AGENTS</div>
+  <div class="agrow"><span class="agn">ATLAS</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">ARIA</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">ECHO</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">LEDGER</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">NOVA</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">MIRA</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">LUMEN</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">SAGE</span><span class="ags on">● WORKING</span></div>
+  <div class="agrow"><span class="agn">PULSE</span><span class="ags off">&#9675; IDLE</span></div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- TODAY -->
+<div class="page on" id="pg-today">
+  <div class="krow">
+    <div class="kcard" style="--ac:var(--c)"><div class="klbl">Task Terbuka</div><div class="kval">118</div><div class="ksub dn"><i class="fa-solid fa-triangle-exclamation fa-xs"></i> 33 overdue</div><i class="fa-solid fa-list-check kico"></i></div>
+    <div class="kcard" style="--ac:var(--g)"><div class="klbl">Habit Hari Ini</div><div class="kval" id="hkpi">0<span style="font-size:13px;color:var(--text3)">/9</span></div><div class="ksub"><i class="fa-solid fa-fire fa-xs"></i> streak: 0</div><i class="fa-solid fa-dumbbell kico"></i></div>
+    <div class="kcard" style="--ac:var(--y)"><div class="klbl">GPA Target</div><div class="kval">4.00</div><div class="ksub up"><i class="fa-solid fa-arrow-trend-up fa-xs"></i> 33% progress</div><i class="fa-solid fa-graduation-cap kico"></i></div>
+    <div class="kcard" style="--ac:var(--p)"><div class="klbl">AI Agents</div><div class="kval">9</div><div class="ksub up"><i class="fa-solid fa-circle fa-xs" style="color:var(--g)"></i> 8 working</div><i class="fa-solid fa-robot kico"></i></div>
+    <div class="kcard" style="--ac:var(--o)"><div class="klbl">Peluang</div><div class="kval">49</div><div class="ksub"><i class="fa-solid fa-globe fa-xs"></i> global companies</div><i class="fa-solid fa-satellite-dish kico"></i></div>
+  </div>
+
+  <!-- DEADLINE COUNTDOWN -->
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-hourglass-half"></i> DEADLINE COUNTDOWN</div><span style="font-size:11px;color:var(--text3)">Real-time</span></div>
+    <div class="cb" style="padding:12px 14px"><div class="cdrow" id="cdrow"></div></div>
+  </div>
+
+  <div class="g21">
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-regular fa-clock"></i> JADWAL HARI INI — <span id="schdate">Sab 12 Sep</span></div><span class="ca">Lihat kalender</span></div>
+      <div class="cb">
+        <div class="schlist">
+          <div class="schitem"><div class="schtime">00.00</div><div class="schline"><div class="schdot done"></div></div><div class="schcon"><div class="schtit">Tidur / recovery</div><div class="schcat">Kesehatan</div></div><span class="badge bx">done</span></div>
+          <div class="schitem"><div class="schtime">05.00</div><div class="schline"><div class="schdot done"></div></div><div class="schcon"><div class="schtit">Ibadah pagi (Bandung)</div><div class="schcat">Ibadah</div></div><span class="badge bx">done</span></div>
+          <div class="schitem"><div class="schtime">05.30</div><div class="schline"><div class="schdot done"></div></div><div class="schcon"><div class="schtit">English practice</div><div class="schcat">Belajar</div></div><span class="badge bx">done</span></div>
+          <div class="schitem" id="sch-active"><div class="schtime">06.00</div><div class="schline"><div class="schdot on"></div></div><div class="schcon"><div class="schtit" style="color:var(--c)">Evaluasi peluang geofisika &amp; beasiswa</div><div class="schcat" style="color:var(--c)">Karier</div></div><span class="badge bc">in progress</span></div>
+          <div class="schitem"><div class="schtime">07.00</div><div class="schline"><div class="schdot"></div></div><div class="schcon"><div class="schtit">Gym pagi (weekday)</div><div class="schcat">Olahraga</div></div><span class="badge by">planned</span></div>
+          <div class="schitem"><div class="schtime">09.00</div><div class="schline"><div class="schdot"></div></div><div class="schcon"><div class="schtit">Deep work: manuskrip publikasi geofisika</div><div class="schcat">Akademik</div></div><span class="badge by">planned</span></div>
+          <div class="schitem"><div class="schtime">14.00</div><div class="schline"><div class="schdot"></div></div><div class="schcon"><div class="schtit">Review keuangan mingguan (LEDGER)</div><div class="schcat">Finansial</div></div><span class="badge by">planned</span></div>
+          <div class="schitem"><div class="schtime">21.00</div><div class="schline"><div class="schdot"></div></div><div class="schcon"><div class="schtit">Review malam + jurnal harian</div><div class="schcat">Refleksi</div></div><span class="badge bx">planned</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-crosshairs"></i> FOKUS SEKARANG</div></div>
+        <div class="cb">
+          <div class="tasklist">
+            <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Finansial: review pemasukan/pengeluaran &amp; dana darurat</div><div class="tmeta late"><i class="fa-solid fa-circle-exclamation fa-xs"></i> 30 Agu · LEDGER</div></div></div>
+            <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Kuliah: review materi &amp; latihan GPA 3.75</div><div class="tmeta late"><i class="fa-solid fa-circle-exclamation fa-xs"></i> 30 Agu · ARIA</div></div></div>
+            <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Karier: manuskrip publikasi — revisi literatur</div><div class="tmeta" style="color:var(--y)">11 Sep · NOVA</div></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- DANA DARURAT -->
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-piggy-bank"></i> DANA DARURAT</div><span style="font-size:11px;color:var(--text3)">Target Rp 15 jt</span></div>
+        <div class="cb" style="padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--g)">Rp 3,7 jt</span><span style="font-size:11px;color:var(--text3)">25%</span></div>
+          <div class="pbar" style="height:6px;margin-bottom:7px"><div class="pfill" style="width:25%;background:linear-gradient(90deg,#00b87d,var(--g))"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)"><span style="color:var(--g)">+Rp 450k bulan ini</span><span>Sisa Rp 11,3 jt</span></div>
+        </div>
+      </div>
+      <!-- HABIT QUICK -->
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-fire"></i> HABIT HARI INI</div><span class="ca" onclick="nav('goals',null)">Semua</span></div>
+        <div class="cb" style="padding:10px 14px">
+          <div style="margin-bottom:10px">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Selesai hari ini</div>
+            <div class="pbar"><div class="pfill" id="hpbar" style="width:0%;background:var(--c)"></div></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px" id="hbadges"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="page" id="pg-goals">
+  <div class="g12">
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-solid fa-bullseye"></i> 8 GOAL AKTIF 2026</div><span style="font-size:11px;color:var(--text3)">16 milestone · 3 project</span></div>
+      <div class="cb">
+        <div style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--c)">118</div><div style="font-size:10px;color:var(--text3)">Terbuka</div></div>
+          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--g)">93</div><div style="font-size:10px;color:var(--text3)">Selesai</div></div>
+          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--r)">33</div><div style="font-size:10px;color:var(--text3)">Overdue</div></div>
+          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text3)">0</div><div style="font-size:10px;color:var(--text3)">Evidence</div></div>
+        </div>
+        <div class="glist" id="glist"></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-chart-radar"></i> GOAL RADAR</div></div>
+        <div class="cb" style="padding:6px"><div id="ch-goals" style="height:260px"></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-table-cells"></i> HABIT MATRIX</div></div>
+        <div class="cb">
+          <div style="display:flex;gap:7px;margin-bottom:7px">
+            <div style="font-size:10px;color:var(--text3);width:126px;flex-shrink:0">HABIT</div>
+            <div style="display:flex;gap:3px;flex:1">
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center">Sen</div>
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center">Sel</div>
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center">Rab</div>
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center">Kam</div>
+              <div style="font-size:10px;color:var(--c);width:24px;text-align:center;font-weight:700">Jum</div>
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center;opacity:.4">Sab</div>
+              <div style="font-size:10px;color:var(--text3);width:24px;text-align:center;opacity:.4">Min</div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);width:28px;text-align:right">%</div>
+          </div>
+          <div class="hgrid" id="hgrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KANBAN -->
+<div class="page" id="pg-kanban">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600">Task Board</span>
+      <span class="badge bc">118 terbuka</span><span class="badge br">33 overdue</span>
+    </div>
+    <select id="kbfil" onchange="renderKanban()"><option value="all">Semua kategori</option><option value="Finansial">Finansial</option><option value="Kuliah">Kuliah</option><option value="Karier">Karier</option><option value="Kesehatan">Kesehatan</option><option value="Akademik">Akademik</option></select>
+  </div>
+  <div class="kanban" id="kanban"></div>
+</div>
+
+<!-- AI TEAM -->
+<div class="page" id="pg-agents">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px">
+    <span style="font-size:13px;font-weight:600">AI Team</span>
+    <span class="badge bg">SAFE</span>
+    <span style="font-size:11px;color:var(--text3);margin-left:auto">674 laporan hari ini</span>
+  </div>
+  <div class="agrid" id="agrid"></div>
+</div>
+
+<!-- CAREER O&G -->
+<div class="page" id="pg-career">
+  <div style="background:linear-gradient(135deg,#0d1f2d,#0d2b1f 50%,#1a0d2e);border:1px solid var(--border);border-radius:var(--rad);padding:20px 22px">
+    <div style="font-size:11px;color:var(--c);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Geoscience / Subsurface Career Intelligence</div>
+    <div style="font-size:19px;font-weight:800;margin-bottom:5px">S2 Geofisika Bandung &#8594; Big Oil &amp; Gas</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;max-width:640px">Roadmap ke <strong style="color:var(--c)">Geoscientist / Subsurface</strong> di Shell, ExxonMobil, SLB, Pertamina &amp; 45+ perusahaan global. Data dari 31 sumber.</div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <span style="padding:3px 10px;border-radius:20px;background:var(--cd);border:1px solid rgba(0,212,255,.25);font-size:11px;color:var(--c)">49+ companies</span>
+      <span style="padding:3px 10px;border-radius:20px;background:var(--gd);border:1px solid rgba(0,229,160,.25);font-size:11px;color:var(--g)">4 fase 2026&#8211;2029</span>
+      <span style="padding:3px 10px;border-radius:20px;background:var(--pd);border:1px solid rgba(155,124,255,.25);font-size:11px;color:var(--p)">8 windows</span>
+    </div>
+  </div>
+
+  <!-- KEY INSIGHT -->
+  <div style="background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-radius:var(--rad);padding:14px 16px;display:flex;gap:12px">
+    <div style="font-size:20px;flex-shrink:0">&#128161;</div>
+    <div><div style="font-size:12px;font-weight:700;color:var(--c);margin-bottom:4px">KEY INSIGHT — 31 sumber terverifikasi</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6"><strong>ITB Bandung menang AAPG IBA 2026</strong> &#8212; sinyal CV terkuat. <strong style="color:var(--y)">Shell Graduate 2027 buka Sep 2026</strong> &#8212; apply SEKARANG. <strong style="color:var(--y)">SLB NextGen rolling</strong> &#8212; apply kapan saja. Gulf NOC (Aramco/ADNOC/QatarEnergy) sponsor expat tapi untuk <em>experienced</em>, bukan fresh grad.</div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-route"></i> ROADMAP 4 FASE</div><span style="font-size:11px;color:var(--text3)">2026&#8211;2029</span></div>
+    <div class="cb" style="padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="padding:12px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--c)">
+        <div style="font-size:10px;font-weight:800;color:var(--c);font-family:var(--mono);margin-bottom:5px">FASE 0 &#8212; Foundation &nbsp; Sep&#8211;Des 2026 &nbsp; <span style="background:var(--cd);padding:1px 6px;border-radius:3px">SEKARANG</span></div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8">&#8226; <strong>Shell Graduate:</strong> Buka aplikasi di shell.com/early-careers sebelum Okt 2026<br>&#8226; <strong>SLB NextGen:</strong> Daftar careers.slb.com &#8212; rolling, apply sekarang<br>&#8226; <strong>LinkedIn:</strong> Headline = Geophysicist | Seismic | Reservoir | ITB, 500+ koneksi<br>&#8226; <strong>Petrel:</strong> Download Student Edition, selesaikan modul Introduction to Petrel<br>&#8226; <strong>Publikasi:</strong> Submit manuskrip ke JAG atau Interpretation (SEG)</div>
+      </div>
+      <div style="padding:12px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--g)">
+        <div style="font-size:10px;font-weight:800;color:var(--g);font-family:var(--mono);margin-bottom:5px">FASE 1 &#8212; Industry Exposure &nbsp; Jan&#8211;Jun 2027</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8">&#8226; Apply internship PHE (ONWJ/Mahakam), SLB Indonesia, atau SKK Migas KKKS<br>&#8226; SEG IMAGE 2027: submit extended abstract (deadline Jan 2027)<br>&#8226; HAGI Annual Meeting 2027: presentasi paper geofisika Indonesia<br>&#8226; Sertifikasi: Python for Geoscience (Agile Scientific), OpendTect ML course<br>&#8226; AAPG IBA 2027: daftar kompetisi tim sebelum Nov 2026</div>
+      </div>
+      <div style="padding:12px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--p)">
+        <div style="font-size:10px;font-weight:800;color:var(--p);font-family:var(--mono);margin-bottom:5px">FASE 2 &#8212; Graduate Applications &nbsp; Jul&#8211;Des 2027</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8">&#8226; <strong>Pertamina/PHE:</strong> BUMN Rekrutmen Bersama Sep&#8211;Nov (rekrutmenbersama.fhcibumn.id)<br>&#8226; <strong>ExxonMobil:</strong> Fall campus cycle Aug&#8211;Nov (corporate.exxonmobil.com)<br>&#8226; <strong>SLB NextGen:</strong> Rolling &#8212; apply kapan saja (careers.slb.com)<br>&#8226; <strong>Shell 2028 intake:</strong> Buka Sep&#8211;Nov 2027<br>&#8226; <strong>bp / TotalEnergies / ENI:</strong> Graduate programs (operate langsung di Indonesia)</div>
+      </div>
+      <div style="padding:12px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--y)">
+        <div style="font-size:10px;font-weight:800;color:var(--y);font-family:var(--mono);margin-bottom:5px">FASE 3 &#8212; Land the Role &nbsp; 2028+</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8">&#8226; Target start Q1&#8211;Q2 2028 di Tier 1 (Shell / bp / SLB / PHE)<br>&#8226; 2 publikasi sebelum lulus = differentiator utama<br>&#8226; Gulf NOC (Aramco/ADNOC): realistis setelah 2&#8211;3 tahun pengalaman<br>&#8226; Backup: PHE atau Medco sebagai stepping stone ke international</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <!-- COMPANIES -->
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-solid fa-globe"></i> 49 GLOBAL COMPANIES</div><span style="font-size:11px;color:var(--text3)">klik buka portal</span></div>
+      <div class="cb" style="padding:10px">
+        <div class="cofilters">
+          <button class="cofil on" onclick="filco('all',this)">Semua</button>
+          <button class="cofil" onclick="filco('id',this)">Indonesia</button>
+          <button class="cofil" onclick="filco('sv',this)">Seismic/OFS</button>
+          <button class="cofil" onclick="filco('eu',this)">Europe</button>
+          <button class="cofil" onclick="filco('me',this)">Middle East</button>
+          <button class="cofil" onclick="filco('ap',this)">Asia-Pacific</button>
+          <button class="cofil" onclick="filco('am',this)">Americas</button>
+          <button class="cofil" onclick="filco('af',this)">Africa</button>
+          <button class="cofil" onclick="filco('hi',this)">HIGH Only</button>
+        </div>
+        <div class="colist" id="colist"></div>
+      </div>
+    </div>
+    <!-- SKILL GAP -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-code"></i> SKILL GAP</div><span style="font-size:11px;color:var(--text3)">Kamu vs industri</span></div>
+        <div class="cb" id="sgap"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct"><i class="fa-solid fa-chart-radar"></i> SKILL RADAR</div></div>
+        <div class="cb" style="padding:6px"><div id="ch-skill" style="height:200px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION WINDOWS -->
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-calendar-check"></i> APPLICATION WINDOWS 2026&#8211;2027</div></div>
+    <div class="cb" style="padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--rd);border:1px solid rgba(255,77,106,.25)"><div style="font-size:10px;font-weight:700;color:var(--r);margin-bottom:3px">&#128680; BUKA SEKARANG</div><div style="font-size:12px;font-weight:600">Shell Graduate 2027</div><div style="font-size:10px;color:var(--text2);margin-top:2px">shell.com/early-careers &#8212; Sep&#8211;Okt 2026</div></div>
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--rd);border:1px solid rgba(255,77,106,.25)"><div style="font-size:10px;font-weight:700;color:var(--r);margin-bottom:3px">&#128680; ROLLING &#8212; Selalu Buka</div><div style="font-size:12px;font-weight:600">SLB NextGen Geoscience</div><div style="font-size:10px;color:var(--text2);margin-top:2px">careers.slb.com &#8212; apply kapan saja</div></div>
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--yd);border:1px solid rgba(255,184,77,.25)"><div style="font-size:10px;font-weight:700;color:var(--y);margin-bottom:3px">&#9201; SOON &#8212; Okt&#8211;Nov 2026</div><div style="font-size:12px;font-weight:600">AAPG IBA 2027 Registration</div><div style="font-size:10px;color:var(--text2);margin-top:2px">Kompetisi CV terkuat &#8212; ITB menang 2026</div></div>
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--yd);border:1px solid rgba(255,184,77,.25)"><div style="font-size:10px;font-weight:700;color:var(--y);margin-bottom:3px">&#9201; SOON &#8212; Nov 2026</div><div style="font-size:12px;font-weight:600">Pertamina BUMN Rekrutmen Bersama</div><div style="font-size:10px;color:var(--text2);margin-top:2px">rekrutmenbersama.fhcibumn.id</div></div>
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px">&#128197; Jan 2027</div><div style="font-size:12px;font-weight:600">SEG IMAGE 2027 Abstract</div><div style="font-size:10px;color:var(--text2);margin-top:2px">Submit extended abstract geofisika</div></div>
+      <div style="padding:10px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px">&#128197; Aug&#8211;Nov 2027</div><div style="font-size:12px;font-weight:600">ExxonMobil Fall Campus Cycle</div><div style="font-size:10px;color:var(--text2);margin-top:2px">corporate.exxonmobil.com</div></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY ACTIONS -->
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-crosshairs"></i> AKSI MINGGU INI &#8212; Sab 12 Sep 2026</div></div>
+    <div class="cb">
+      <div class="tasklist">
+        <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">URGENT: Buka shell.com/early-careers &#8212; mulai aplikasi Shell Graduate 2027</div><div class="tmeta late">DEADLINE Sep&#8211;Okt 2026 &bull; ATLAS</div></div></div>
+        <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">URGENT: Daftar &amp; upload CV di careers.slb.com (SLB NextGen Geoscience)</div><div class="tmeta late">ROLLING &bull; SAGE</div></div></div>
+        <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Update LinkedIn: headline = Geophysicist | Seismic Interpretation | ITB</div><div class="tmeta">SAGE</div></div></div>
+        <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Download Petrel Student Edition &amp; mulai tutorial Introduction to Petrel</div><div class="tmeta">LUMEN</div></div></div>
+        <div class="taskitem" onclick="chk(this)"><div class="chk"></div><div style="flex:1"><div class="ttxt">Cek jadwal AAPG IBA 2027 &#8212; siapkan tim dan proposal sebelum Nov 2026</div><div class="tmeta">NOVA</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNAL -->
+<div class="page" id="pg-journal">
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-solid fa-pen-nib"></i> TULIS REFLEKSI</div></div>
+      <div class="cb">
+        <div class="jform">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="flex:1"><div class="jlbl">Tipe</div><select style="width:100%"><option>Harian</option><option>Mingguan</option><option>Bulanan</option></select></div>
+            <div style="flex:2"><div class="jlbl">Mood</div><div class="mood-row"><button class="mbtn" onclick="mood(this)">&#128516; Great</button><button class="mbtn" onclick="mood(this)">&#128578; Good</button><button class="mbtn" onclick="mood(this)">&#128528; Okay</button><button class="mbtn" onclick="mood(this)">&#128532; Meh</button></div></div>
+          </div>
+          <div class="jfield"><div class="jlbl">&#127775; Highlight hari ini</div><textarea placeholder="Apa yang paling bermakna hari ini?"></textarea></div>
+          <div class="jrow">
+            <div class="jfield"><div class="jlbl">&#127942; Wins</div><textarea placeholder="Kemenangan kecil?" style="min-height:50px"></textarea></div>
+            <div class="jfield"><div class="jlbl">&#128591; Gratitude</div><textarea placeholder="3 hal yang kamu syukuri..." style="min-height:50px"></textarea></div>
+          </div>
+          <div class="jrow">
+            <div class="jfield"><div class="jlbl">&#128679; Blockers</div><textarea placeholder="Apa yang menghambat?" style="min-height:50px"></textarea></div>
+            <div class="jfield"><div class="jlbl">&#127919; Next focus</div><textarea placeholder="Satu fokus terpenting besok..." style="min-height:50px"></textarea></div>
+          </div>
+          <button class="btn btnc" style="align-self:flex-start" onclick="saveJournal()"><i class="fa-solid fa-floppy-disk fa-xs"></i> Simpan refleksi</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-regular fa-bookmark"></i> RIWAYAT</div><span class="ca">1 entri</span></div>
+      <div class="cb">
+        <div style="padding:10px 12px;background:var(--bg3);border-radius:var(--rsm);border:1px solid var(--border);margin-bottom:12px;cursor:pointer">
+          <div style="font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:3px">Kam 10 Sep 2026 · Harian · &#128516;</div>
+          <div style="font-size:11px;color:var(--text2)">hai &#8212; entri pertama tersimpan di PostgreSQL. Sistem berjalan normal.</div>
+        </div>
+        <div class="slbl">Panduan Harian</div>
+        <div class="tasklist">
+          <div class="taskitem" style="cursor:default"><span>&#127775;</span><div class="ttxt">Apa highlight hari ini?</div></div>
+          <div class="taskitem" style="cursor:default"><span>&#127942;</span><div class="ttxt">Kemenangan kecil apa?</div></div>
+          <div class="taskitem" style="cursor:default"><span>&#128679;</span><div class="ttxt">Apa yang menghambat?</div></div>
+          <div class="taskitem" style="cursor:default"><span>&#128161;</span><div class="ttxt">Pelajaran hari ini?</div></div>
+          <div class="taskitem" style="cursor:default"><span>&#127919;</span><div class="ttxt">Satu fokus besok?</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="page" id="pg-analytics">
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-chart-area"></i> TASK COMPLETION</div></div><div class="cb" style="padding:6px"><div id="ch-tasks" style="height:200px"></div></div></div>
+    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-fire"></i> HABIT CHECK-IN</div></div><div class="cb" style="padding:6px"><div id="ch-habits" style="height:200px"></div></div></div>
+    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-chart-pie"></i> DISTRIBUSI TASK</div></div><div class="cb" style="padding:6px"><div id="ch-cats" style="height:200px"></div></div></div>
+    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-bars-progress"></i> GOAL PROGRESS</div></div><div class="cb" style="padding:6px"><div id="ch-goals2" style="height:200px"></div></div></div>
+  </div>
+</div>
+
+<!-- WAR ROOM -->
+<div class="page" id="pg-warroom">
+  <div class="g21">
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-solid fa-shield-halved"></i> PERSONAL ASSISTANT CONTROL ROOM</div><span class="badge bg">3 pesan</span></div>
+      <div class="cb">
+        <div class="warchat" id="wchat">
+          <div class="wmsg own"><div class="wfrom">OWNER</div><div class="wtxt">cari beasiswa perusahaan</div></div>
+          <div class="wmsg agt"><div class="wfrom">ATLAS</div><div class="wtxt">Rencana aksi: 1) verifikasi tujuan; 2) definisikan 1&#8211;3 langkah evidence-based; 3) tetapkan tenggat. Uncertainty: 60&#8211;75%. &#8212; 11 Sep 2026</div></div>
+        </div>
+        <div style="display:flex;gap:7px;margin-top:8px">
+          <input class="winput" id="winput" placeholder="Tulis arahan sebagai owner..." onkeydown="if(event.key==='Enter')sendW()">
+          <button class="btn btnc" onclick="sendW()"><i class="fa-solid fa-paper-plane fa-xs"></i> Kirim</button>
+        </div>
+        <div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">
+          <button class="btn btnc bsm" onclick="toast('&#9989;','Task dibuat dari War Room','g')"><i class="fa-solid fa-circle-check fa-xs"></i> Approve &amp; create task</button>
+          <button class="btn btng bsm"><i class="fa-solid fa-rotate fa-xs"></i> Minta analisis ulang</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fa-solid fa-robot"></i> STATUS AGENT</div></div>
+      <div class="cb" style="padding:10px;display:flex;flex-direction:column;gap:5px" id="warstatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- OPPORTUNITIES -->
+<div class="page" id="pg-opps">
+  <!-- HERO -->
+  <div style="background:linear-gradient(135deg,#f0f8ff,#e8f4f8);border:1px solid var(--border);border-radius:var(--rad);padding:18px 22px">
+    <div style="font-size:11px;color:var(--c);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Career Intelligence</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:5px;color:#0d0f14">Opportunities Geofisika</div>
+    <div style="font-size:12px;color:#4a5368;line-height:1.6">Beasiswa, kerja, intern, dan remote jobs terkait geofisika — dikurasi dari 31 sumber. Klik untuk buka langsung.</div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <span style="padding:3px 10px;border-radius:20px;background:var(--cd);border:1px solid rgba(0,212,255,.25);font-size:11px;color:var(--c)">49 companies</span>
+      <span style="padding:3px 10px;border-radius:20px;background:var(--gd);border:1px solid rgba(0,229,160,.25);font-size:11px;color:var(--g)">Beasiswa aktif</span>
+      <span style="padding:3px 10px;border-radius:20px;background:var(--yd);border:1px solid rgba(255,184,77,.25);font-size:11px;color:var(--y)">Intern tersedia</span>
+    </div>
+  </div>
+
+  <!-- FILTER & SEARCH -->
+  <div class="card">
+    <div class="ch"><div class="ct">&#128225; Cari Peluang</div></div>
+    <div class="cb" style="padding:12px 14px">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input id="oppsearch" oninput="filterOpps()" placeholder="Cari: geophysics, beasiswa, Shell, intern..." style="flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;color:var(--text);font-family:var(--font);font-size:12px">
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="opps-filters">
+        <button class="cofil on" onclick="setOppType(this,'all')">Semua</button>
+        <button class="cofil" onclick="setOppType(this,'scholarship')">&#127891; Beasiswa</button>
+        <button class="cofil" onclick="setOppType(this,'job')">&#128188; Full-time</button>
+        <button class="cofil" onclick="setOppType(this,'intern')">&#127979; Internship</button>
+        <button class="cofil" onclick="setOppType(this,'remote')">&#127758; Remote</button>
+        <button class="cofil" onclick="setOppType(this,'competition')">&#127942; Kompetisi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><div class="ct">&#127891; Beasiswa &amp; Fellowship</div><span style="font-size:11px;color:var(--text3)">klik buka portal</span></div>
+      <div class="cb" style="padding:10px;display:flex;flex-direction:column;gap:5px">
+        <a href="https://seg.org/Scholarships" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">SEG/AAPG Foundation Scholarships<span class="cotag hi">HIGH</span></div><div class="cosub">Geophysics S1-S2 &bull; USD 1K-10K &bull; Annual &bull; seg.org</div></div>
+          <span class="comatch" style="color:var(--g)">92%</span>
+        </a>
+        <a href="https://www.dfg.de/en/research-funding/funding-opportunities/" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">DFG Research Fellowship &#127465;&#127466;<span class="cotag hi">HIGH</span></div><div class="cosub">Post-S2/S3 di Jerman &bull; Geosciences &bull; Funded &bull; dfg.de</div></div>
+          <span class="comatch" style="color:var(--g)">85%</span>
+        </a>
+        <a href="https://www.mitacs.ca/our-programs/globalink-research-internship/" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">Mitacs Globalink Research &#127464;&#127462;<span class="cotag hi">HIGH</span></div><div class="cosub">Magang riset 12 minggu di Kanada &bull; Fully funded &bull; mitacs.ca</div></div>
+          <span class="comatch" style="color:var(--g)">80%</span>
+        </a>
+        <a href="https://www.daad.de/en/study-and-research-in-germany/scholarships/" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">DAAD Study Scholarships &#127465;&#127466;<span class="cotag hi">HIGH</span></div><div class="cosub">S2/S3 di Jerman &bull; EUR 850/bln &bull; WNI eligible &bull; daad.de</div></div>
+          <span class="comatch" style="color:var(--g)">82%</span>
+        </a>
+        <a href="https://hagi.or.id/" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">HAGI Student Award &#127470;&#127465;<span class="cotag hi">HIGH</span></div><div class="cosub">Geofisika Indonesia &bull; Annual &bull; Networking industri &bull; hagi.or.id</div></div>
+          <span class="comatch" style="color:var(--g)">90%</span>
+        </a>
+        <a href="https://www.slb.com/about/foundation" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">Schlumberger Faculty for Future<span class="cotag me">MED</span></div><div class="cosub">PhD/Postdoc &bull; STEM women &bull; USD 50K/yr &bull; slb.com</div></div>
+          <span class="comatch" style="color:var(--y)">65%</span>
+        </a>
+        <a href="https://www.un-ihe.org/fellowships" target="_blank" rel="noopener" class="cocard">
+          <span style="font-size:16px">&#127891;</span>
+          <div class="coinfo"><div class="coname">UNESCO-IHE MSc Fellowship<span class="cotag me">MED</span></div><div class="cosub">MSc Earth Sciences &bull; Negara berkembang &bull; Fully funded</div></div>
+          <span class="comatch" style="color:var(--y)">68%</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="ch"><div class="ct">&#127979; Internship &amp; Magang</div><span style="font-size:11px;color:var(--text3)">2026-2027</span></div>
+        <div class="cb" style="padding:10px;display:flex;flex-direction:column;gap:5px">
+          <a href="https://karir.pertamina.com/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127470;&#127465;</span>
+            <div class="coinfo"><div class="coname">PHE Internship (ONWJ/Mahakam)<span class="cotag hi">HIGH</span></div><div class="cosub">Subsurface Geophysics &bull; Jan-Mar 2027 &bull; phe.pertamina.com</div></div>
+            <span class="comatch" style="color:var(--g)">92%</span>
+          </a>
+          <a href="https://careers.slb.com/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127758;</span>
+            <div class="coinfo"><div class="coname">SLB Field Engineer Internship<span class="cotag hi">HIGH</span></div><div class="cosub">Jakarta &bull; Rolling &bull; Geoscience &bull; careers.slb.com</div></div>
+            <span class="comatch" style="color:var(--g)">88%</span>
+          </a>
+          <a href="https://www.hess.com/careers" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127470;&#127465;</span>
+            <div class="coinfo"><div class="coname">HESS Geophysicist Intern<span class="cotag me">MED</span></div><div class="cosub">Jakarta &bull; Okt 2026 &bull; hess.com/careers</div></div>
+            <span class="comatch" style="color:var(--y)">72%</span>
+          </a>
+          <a href="https://careers.totalenergies.com/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127467;&#127479;</span>
+            <div class="coinfo"><div class="coname">TotalEnergies Geoscience Intern<span class="cotag me">MED</span></div><div class="cosub">Paris / Jakarta &bull; Nov 2026 &bull; totalenergies.com</div></div>
+            <span class="comatch" style="color:var(--y)">75%</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><div class="ct">&#127942; Kompetisi &amp; Project</div></div>
+        <div class="cb" style="padding:10px;display:flex;flex-direction:column;gap:5px">
+          <a href="https://seg.org/Annual-Meeting-Home/About-IMAGE" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127942;</span>
+            <div class="coinfo"><div class="coname">SEG IMAGE 2027 Student Paper<span class="cotag hi">HIGH</span></div><div class="cosub">Global &bull; Cash prize + networking &bull; Abstract deadline Jan 2027</div></div>
+            <span class="comatch" style="color:var(--g)">85%</span>
+          </a>
+          <a href="https://hagi.or.id/annual-meeting" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127942;</span>
+            <div class="coinfo"><div class="coname">HAGI Annual Meeting 2027<span class="cotag hi">HIGH</span></div><div class="cosub">Indonesia &bull; Paper presentation &bull; Networking industri</div></div>
+            <span class="comatch" style="color:var(--g)">88%</span>
+          </a>
+          <a href="https://github.com/bolgebrygg/MalenoV" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127942;</span>
+            <div class="coinfo"><div class="coname">FORCE ML Seismic Competition<span class="cotag me">MED</span></div><div class="cosub">Open data Norway &bull; Python+ML &bull; Portfolio builder</div></div>
+            <span class="comatch" style="color:var(--y)">78%</span>
+          </a>
+          <a href="https://www.nopims.dmp.wa.gov.au/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#128202;</span>
+            <div class="coinfo"><div class="coname">NOPIMS Open Seismic Dataset<span class="cotag me">MED</span></div><div class="cosub">Australia &bull; Free data &bull; Ideal untuk analisis mandiri &amp; publikasi</div></div>
+            <span class="comatch" style="color:var(--y)">72%</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><div class="ct">&#128188; Full-time &amp; Remote</div></div>
+        <div class="cb" style="padding:10px;display:flex;flex-direction:column;gap:5px">
+          <a href="https://rekrutmenbersama.fhcibumn.id/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127470;&#127465;</span>
+            <div class="coinfo"><div class="coname">Pertamina MT / PHE Geophysicist<span class="cotag hi">HIGH</span></div><div class="cosub">Jakarta &bull; Sep-Nov 2026 &bull; rekrutmenbersama.fhcibumn.id</div></div>
+            <span class="comatch" style="color:var(--g)">96%</span>
+          </a>
+          <a href="https://careers.slb.com/" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127758;</span>
+            <div class="coinfo"><div class="coname">SLB NextGen Geoscience Graduate<span class="cotag hi">HIGH</span></div><div class="cosub">Global (Jakarta) &bull; Rolling &bull; EXPAT OK &bull; careers.slb.com</div></div>
+            <span class="comatch" style="color:var(--g)">92%</span>
+          </a>
+          <a href="https://www.shell.com/careers/early-careers.html" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#128680;</span>
+            <div class="coinfo"><div class="coname">Shell Graduate Programme 2027<span class="cotag hi">HOT</span></div><div class="cosub">Global &bull; BUKA SEKARANG Sep-Okt 2026 &bull; shell.com</div></div>
+            <span class="comatch" style="color:var(--g)">88%</span>
+          </a>
+          <a href="https://viridiengroup.com/careers" target="_blank" rel="noopener" class="cocard">
+            <span style="font-size:16px">&#127758;</span>
+            <div class="coinfo"><div class="coname">CGG/Viridien Geophysicist Remote<span class="cotag hi">HIGH</span></div><div class="cosub">Remote eligible &bull; Seismic processing &bull; viridiengroup.com</div></div>
+            <span class="comatch" style="color:var(--g)">86%</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ══ DATA ══
+var habits = [
+  {name:'New learning',days:[0,0,0,0,0],w:7,e:'📖'},
+  {name:'Read book',days:[0,0,0,0,0],w:7,e:'📚'},
+  {name:'Evening walk',days:[0,0,0,0,0],w:7,e:'🚶'},
+  {name:'Workout',days:[0,0,0,0,0],w:5,e:'💪'},
+  {name:'Journal',days:[0,0,0,0,0],w:7,e:'📝'},
+  {name:'Skin-care',days:[0,0,0,0,0],w:7,e:'✨'},
+  {name:'Deep work geo',days:[0,0,0,1,0],w:5,e:'🔬'},
+  {name:'Olahraga sore',days:[0,0,0,0,0],w:7,e:'🏃'},
+  {name:'Review malam',days:[0,0,0,0,0],w:7,e:'🌙'}
+];
+
+var goals = [
+  {name:'📚 Akademik',pct:33,col:'#00d4ff',m:5,t:6,h:2,pri:'HIGH'},
+  {name:'💰 Finansial',pct:25,col:'#00e5a0',m:3,t:4,h:0,pri:'HIGH'},
+  {name:'🛤 Personal Dev',pct:50,col:'#9b7cff',m:1,t:2,h:4,pri:'HIGH'},
+  {name:'💼 Karier',pct:0,col:'#ffb84d',m:3,t:4,h:0,pri:'URGENT'},
+  {name:'💪 Kesehatan',pct:0,col:'#ff4d6a',m:1,t:2,h:3,pri:'HIGH'},
+  {name:'✨ Karakter',pct:0,col:'#e8ecf4',m:1,t:2,h:0,pri:'MED'},
+  {name:'🤝 Relasi',pct:50,col:'#00b87d',m:1,t:2,h:0,pri:'MED'},
+  {name:'🗺 Travel',pct:0,col:'#ff7c4d',m:1,t:2,h:0,pri:'LOW'}
+];
+
+var kanbanData = {
+  NEXT:    {col:'#00d4ff',cnt:71,cards:[{t:'Finansial: review pemasukan/pengeluaran mingguan',ag:'LEDGER',due:'30 Agu',late:true,cat:'Finansial'},{t:'Kuliah: review materi GPA 3.75',ag:'MIRA',due:'30 Agu',late:true,cat:'Kuliah'},{t:'Karier: manuskrip publikasi',ag:'NOVA',due:'11 Sep',late:false,cat:'Karier'}]},
+  'IN REVIEW':{col:'#ffb84d',cnt:20,cards:[{t:'Evaluasi peluang geofisika & beasiswa',ag:'ATLAS',due:'11 Sep',late:false,cat:'Karier'},{t:'Finansial: cashflow runway',ag:'LEDGER',due:'30 Sep',late:false,cat:'Finansial'}]},
+  DONE:    {col:'#00e5a0',cnt:93,cards:[{t:'Komunikasi berkualitas / rapikan friksi',ag:'ATLAS',due:'10 Sep',late:false,cat:'Relasi'}]},
+  BLOCKED: {col:'#ff4d6a',cnt:27,cards:[{t:'Dana darurat: progress bulanan',ag:'LEDGER',due:'30 Agu',late:true,cat:'Finansial'},{t:'Kuliah: jaga IP semester 4.00',ag:'ARIA',due:'30 Sep',late:false,cat:'Kuliah'}]}
+};
+
+var agentData = [
+  {name:'ATLAS',role:'Chief Strategist',col:'#00d4ff',task:'Trading paper trading, stop loss, evaluasi rutin.',done:13,blocked:21},
+  {name:'ARIA',role:'Executive Assistant',col:'#9b7cff',task:'Kelola kalender, proteksi komitmen, jadwal konflik.',done:10,blocked:9},
+  {name:'ECHO',role:'Performance Auditor',col:'#00e5a0',task:'Evaluasi journal, task/habit, laporan mingguan.',done:13,blocked:23},
+  {name:'LEDGER',role:'Personal Finance',col:'#ffb84d',task:'Catat cashflow, budgeting, dana darurat.',done:3,blocked:21},
+  {name:'NOVA',role:'Research Analyst',col:'#ff7c4d',task:'Akademik S2: kuliah, riset reservoir, publikasi.',done:4,blocked:2},
+  {name:'MIRA',role:'Health & Habit',col:'#ff4d6a',task:'Rutinitas gym, sleep, nutrisi, recovery.',done:5,blocked:5},
+  {name:'LUMEN',role:'Learning Coach',col:'#00a8cc',task:'English, portfolio geofisika, deliverable.',done:5,blocked:4},
+  {name:'SAGE',role:'Career Intel',col:'#00b87d',task:'Radar karier geofisika: job, beasiswa, PhD.',done:3,blocked:3},
+  {name:'PULSE',role:'Communication',col:'#5c6680',task:'Draft email, follow-up, context switching.',done:1,blocked:2}
+];
+
+var companies = [
+  {name:'Pertamina / PHE',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#06d6a0',pri:'HIGH',role:'Geofisikawan, Reservoir, G&G',prog:'BUMN Rekrutmen Bersama',url:'https://rekrutmenbersama.fhcibumn.id/',ex:false,m:96},
+  {name:'bp Indonesia (Tangguh)',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#4cc9f0',pri:'HIGH',role:'Geoscientist, Subsurface',prog:'Graduate (local hire)',url:'https://bp.com/careers',ex:false,m:90},
+  {name:'ENI Indonesia',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#ffb703',pri:'HIGH',role:'Geophysicist, Seismic',prog:'ENI Graduate/Direct',url:'https://eni.com/careers',ex:false,m:85},
+  {name:'ExxonMobil Cepu',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#ef233c',pri:'HIGH',role:'Geoscientist, Reservoir',prog:'Local hire / campus',url:'https://jobs.exxonmobil.com/',ex:false,m:84},
+  {name:'INPEX Masela',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#219ebc',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Direct Hire',url:'https://inpex.co.jp/english/career/',ex:false,m:82},
+  {name:'Medco Energi',co:'Indonesia',fl:'🇮🇩',reg:'id',col:'#7b2d8b',pri:'MED',role:'Geophysicist, G&G',prog:'Direct Hire',url:'https://medcoenergi.com/en/career',ex:false,m:80},
+  {name:'SLB / WesternGeco',co:'Global (Jakarta)',fl:'🌍',reg:'sv',col:'#00b4d8',pri:'HIGH',role:'Geophysicist, Seismic',prog:'NextGen Graduate - Rolling',url:'https://careers.slb.com/',ex:true,m:92},
+  {name:'CGG / Viridien',co:'France/Global',fl:'🇫🇷',reg:'sv',col:'#4361ee',pri:'HIGH',role:'Geophysicist, Data Sci',prog:'Graduate/Direct',url:'https://viridiengroup.com/careers',ex:true,m:86},
+  {name:'Fugro',co:'Netherlands/Global',fl:'🇳🇱',reg:'sv',col:'#f4a261',pri:'HIGH',role:'Geophysicist, Marine',prog:'Graduate Trainee',url:'https://fugro.com/careers',ex:true,m:82},
+  {name:'TGS',co:'Norway/Global',fl:'🇳🇴',reg:'sv',col:'#2d6a4f',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Direct Hire',url:'https://tgs.com/careers',ex:true,m:80},
+  {name:'PGS',co:'Norway/Global',fl:'🇳🇴',reg:'sv',col:'#3a86ff',pri:'HIGH',role:'Geophysicist, Marine',prog:'Graduate Programme',url:'https://pgs.com/careers/',ex:true,m:79},
+  {name:'Baker Hughes',co:'USA/Global',fl:'🇺🇸',reg:'sv',col:'#219ebc',pri:'MED',role:'Geoscientist, Petro',prog:'Early Career',url:'https://careers.bakerhughes.com/',ex:true,m:74},
+  {name:'Shell',co:'Netherlands/Global',fl:'🇳🇱',reg:'eu',col:'#ffd166',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Graduate Programme',url:'https://shell.com/careers/early-careers.html',ex:true,m:88},
+  {name:'bp',co:'UK/Global',fl:'🇬🇧',reg:'eu',col:'#4cc9f0',pri:'HIGH',role:'Geophysicist, Reservoir',prog:'Graduate Programme',url:'https://bp.com/careers/students-and-graduates.html',ex:true,m:90},
+  {name:'TotalEnergies',co:'France/Global',fl:'🇫🇷',reg:'eu',col:'#f77f00',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Graduate Program',url:'https://careers.totalenergies.com/',ex:true,m:87},
+  {name:'ENI',co:'Italy/Global',fl:'🇮🇹',reg:'eu',col:'#ffb703',pri:'HIGH',role:'Geophysicist, Seismic',prog:'ENI Graduate',url:'https://eni.com/en-IT/careers.html',ex:true,m:85},
+  {name:'Equinor',co:'Norway',fl:'🇳🇴',reg:'eu',col:'#e63946',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Graduate Programme',url:'https://equinor.com/careers/early-careers',ex:true,m:78},
+  {name:'Aker BP',co:'Norway',fl:'🇳🇴',reg:'eu',col:'#2d6a4f',pri:'MED',role:'Geoscientist, Seismic',prog:'Graduate/Direct',url:'https://akerbp.com/en/careers/',ex:true,m:65},
+  {name:'Repsol',co:'Spain/Global',fl:'🇪🇸',reg:'eu',col:'#ffb703',pri:'MED',role:'Geoscientist, Expl.',prog:'Graduate',url:'https://repsol.com/en/careers/',ex:true,m:65},
+  {name:'Saudi Aramco',co:'Saudi Arabia',fl:'🇸🇦',reg:'me',col:'#e9c46a',pri:'HIGH',role:'Geophysicist, Seismic',prog:'PDP (experienced)',url:'https://aramco.com/en/careers',ex:true,m:58},
+  {name:'ADNOC',co:'UAE',fl:'🇦🇪',reg:'me',col:'#f77f00',pri:'HIGH',role:'Geophysicist, Subsurface',prog:'Grad (Emirati-pri)',url:'https://careers.adnoc.ae/',ex:true,m:55},
+  {name:'QatarEnergy',co:'Qatar',fl:'🇶🇦',reg:'me',col:'#8ecae6',pri:'HIGH',role:'Geoscientist, Reservoir',prog:'GDP (Qatari-pri)',url:'https://careers.qatarenergy.qa/',ex:true,m:57},
+  {name:'PDO (Oman)',co:'Oman',fl:'🇴🇲',reg:'me',col:'#e76f51',pri:'MED',role:'Geoscientist, Seismic',prog:'PDO Graduate',url:'https://pdo.co.om/en/careers/',ex:true,m:55},
+  {name:'Kuwait Oil Company',co:'Kuwait',fl:'🇰🇼',reg:'me',col:'#219ebc',pri:'MED',role:'Geophysicist, Seismic',prog:'Graduate Trainee',url:'https://kockw.com/sites/EN/Pages/Careers.aspx',ex:true,m:52},
+  {name:'PETRONAS',co:'Malaysia',fl:'🇲🇾',reg:'ap',col:'#06d6a0',pri:'HIGH',role:'Geoscientist, Seismic',prog:'PETRONAS Graduate',url:'https://careers.petronas.com/',ex:true,m:82},
+  {name:'Woodside Energy',co:'Australia',fl:'🇦🇺',reg:'ap',col:'#3a86ff',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Woodside Graduate',url:'https://woodside.com/careers',ex:true,m:76},
+  {name:'Chevron Australia',co:'Australia',fl:'🇦🇺',reg:'ap',col:'#e9c46a',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Graduate Dev Program',url:'https://chevroncareers.com/',ex:true,m:78},
+  {name:'Santos',co:'Australia',fl:'🇦🇺',reg:'ap',col:'#f4a261',pri:'MED',role:'Geophysicist, G&G',prog:'Graduate/Direct',url:'https://santos.com/careers/',ex:true,m:72},
+  {name:'PTTEP',co:'Thailand',fl:'🇹🇭',reg:'ap',col:'#4cc9f0',pri:'MED',role:'Geophysicist, G&G',prog:'PTTEP Graduate',url:'https://careers.pttep.com/',ex:true,m:68},
+  {name:'ExxonMobil',co:'USA/Global',fl:'🇺🇸',reg:'am',col:'#ef233c',pri:'HIGH',role:'Geophysicist, Reservoir',prog:'Fall Campus Cycle',url:'https://jobs.exxonmobil.com/',ex:true,m:84},
+  {name:'Chevron USA',co:'USA/Global',fl:'🇺🇸',reg:'am',col:'#e9c46a',pri:'HIGH',role:'Geoscientist, Seismic',prog:'Graduate Dev',url:'https://chevroncareers.com/',ex:true,m:78},
+  {name:'ConocoPhillips',co:'USA/Global',fl:'🇺🇸',reg:'am',col:'#e63946',pri:'MED',role:'Geophysicist, Reservoir',prog:'Graduate Hire',url:'https://jobs.conocophillips.com/',ex:true,m:72},
+  {name:'Hess',co:'USA',fl:'🇺🇸',reg:'am',col:'#4361ee',pri:'MED',role:'Geophysicist, G&G',prog:'Graduate/Direct',url:'https://hess.com/careers',ex:true,m:65},
+  {name:'TotalEnergies Angola',co:'Angola',fl:'🇦🇴',reg:'af',col:'#f77f00',pri:'MED',role:'Geophysicist, Seismic',prog:'Via global grad program',url:'https://careers.totalenergies.com/',ex:true,m:65},
+  {name:'Shell Nigeria',co:'Nigeria',fl:'🇳🇬',reg:'af',col:'#ffd166',pri:'LOW',role:'Geophysicist, G&G',prog:'Via global grad, rotation',url:'https://shell.com/careers/early-careers.html',ex:true,m:52}
+];
+
+var skillGaps = [
+  {name:'Petrel (SLB)',lvl:20,req:85,col:'#00d4ff',pri:'CRITICAL'},
+  {name:'Kingdom (IHS)',lvl:15,req:70,col:'#00d4ff',pri:'CRITICAL'},
+  {name:'Python Geoscience',lvl:55,req:80,col:'#00e5a0',pri:'HIGH'},
+  {name:'Seismic Interpretation',lvl:60,req:90,col:'#ffb84d',pri:'HIGH'},
+  {name:'Well Log Analysis',lvl:45,req:75,col:'#ffb84d',pri:'HIGH'},
+  {name:'English Technical',lvl:70,req:90,col:'#00e5a0',pri:'HIGH'},
+  {name:'AVO / Rock Physics',lvl:30,req:65,col:'#9b7cff',pri:'MED'},
+  {name:'Reservoir Modeling',lvl:25,req:70,col:'#9b7cff',pri:'MED'},
+  {name:'LinkedIn / Network',lvl:30,req:80,col:'#e8ecf4',pri:'HIGH'}
+];
+
+var warR = [
+  ['ATLAS','Menerima arahan. Akan susun rencana aksi — mohon konfirmasi sebelum eksekusi.'],
+  ['ECHO','Mencatat. Akan audit evidence dan laporkan dalam 15 menit.'],
+  ['ARIA','Siap. Akan sesuaikan jadwal dan cek konflik komitmen.'],
+  ['ATLAS','Rencana siap. Klik Approve untuk lanjut.']
+];
+var warIdx = 0;
+
+var deadlines = [
+  {lbl:'Shell Graduate 2027',dt:new Date('2026-10-01T23:59:00')},
+  {lbl:'Finansial: dana darurat',dt:new Date('2026-09-12T16:00:00')},
+  {lbl:'Kuliah: review GPA 3.75',dt:new Date('2026-09-13T23:59:00')},
+  {lbl:'Portfolio deliverable',dt:new Date('2026-09-20T23:59:00')},
+  {lbl:'AAPG IBA 2027 reg.',dt:new Date('2026-11-01T23:59:00')}
+];
+
+// ══ NAVIGATION ══
+var charts = {};
+var PAGES = ['today','goals','kanban','agents','career','opps','journal','analytics','warroom'];
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.ntab').forEach(function(t){ t.classList.remove('on'); });
+  document.querySelectorAll('.si').forEach(function(s){ s.classList.remove('on'); });
+  var pg = document.getElementById('pg-' + id);
+  if (pg) pg.classList.add('on');
+  if (btn) btn.classList.add('on');
+  if (!charts[id]) {
+    charts[id] = true;
+    if (id === 'goals')     { renderGoalChart(); renderHGrid(); }
+    if (id === 'analytics') { renderAnalytics(); }
+    if (id === 'career')    { renderSkillGap(); setTimeout(function(){ renderSkillRadar(); }, 80); }
+  }
+}
+
+// ══ CLOCK ══
+function tick() {
+  var n = new Date();
+  var days   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  var hh = String(n.getHours()).padStart(2,'0');
+  var mm = String(n.getMinutes()).padStart(2,'0');
+  var lbl = days[n.getDay()] + ' ' + n.getDate() + ' ' + months[n.getMonth()];
+  var clk = document.getElementById('clk');
+  if (clk) clk.textContent = lbl + ' ' + hh + ':' + mm;
+  var sdate = document.getElementById('schdate');
+  if (sdate) sdate.textContent = lbl;
+  // day progress 05:00-23:00
+  var start = 5*60, end = 23*60;
+  var cur   = n.getHours()*60 + n.getMinutes();
+  var pct   = Math.min(100, Math.max(0, Math.round((cur-start)/(end-start)*100)));
+  var dpf = document.getElementById('dpf');
+  var dpct = document.getElementById('dpct');
+  if (dpf) dpf.style.width = pct + '%';
+  if (dpct) dpct.textContent = pct + '%';
+}
+tick();
+setInterval(tick, 30000);
+
+// ══ COUNTDOWNS ══
+function renderCD() {
+  var row = document.getElementById('cdrow');
+  if (!row) return;
+  var now = new Date();
+  row.innerHTML = deadlines.map(function(d) {
+    var ms = d.dt - now;
+    var cls = 'ok', txt = '';
+    if (ms < 0) { cls = 'late'; txt = 'OVERDUE'; }
+    else {
+      var days = Math.floor(ms/86400000);
+      var hrs  = Math.floor((ms%86400000)/3600000);
+      var mins = Math.floor((ms%3600000)/60000);
+      if (days >= 2) { cls = 'ok';   txt = days + 'd ' + hrs + 'h'; }
+      else if (days >= 1) { cls = 'soon'; txt = days + 'd ' + hrs + 'h'; }
+      else { cls = hrs < 6 ? 'late' : 'soon'; txt = hrs + 'h ' + mins + 'm'; }
+    }
+    var ds = d.dt.toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    return '<div class="cdi"><div class="cdlbl">' + d.lbl + '</div><div class="cdtim ' + cls + '">' + txt + '</div><div class="cddate">' + ds + '</div></div>';
+  }).join('');
+}
+renderCD();
+setInterval(renderCD, 60000);
+
+// ══ HABITS ══
+function renderHGrid() {
+  var el = document.getElementById('hgrid');
+  if (!el) return;
+  var days_lbl = ['S','S','R','K','J','S','M'];
+  el.innerHTML = habits.map(function(h, hi) {
+    var done = h.days.filter(Boolean).length;
+    var pct  = Math.round(done / h.w * 100);
+    var dhtml = '';
+    for (var d = 0; d < 7; d++) {
+      var cls = 'hday';
+      if (d < 5 && h.days[d]) cls += ' done';
+      if (d === 4) cls += ' today';
+      if (d >= 5) cls += ' fut';
+      var label = (d < 5 && h.days[d]) ? '✓' : days_lbl[d];
+      dhtml += '<div class="' + cls + '" data-hi="' + hi + '" data-d="' + d + '" onclick="toggleH(this)">' + label + '</div>';
+    }
+    return '<div class="hrow"><div class="hname">' + h.e + ' ' + h.name + '</div><div class="hdays">' + dhtml + '</div><div class="hpct">' + pct + '%</div></div>';
+  }).join('');
+}
+
+function toggleH(el) {
+  var hi = parseInt(el.dataset.hi);
+  var d  = parseInt(el.dataset.d);
+  if (d >= 5) return;
+  habits[hi].days[d] = habits[hi].days[d] ? 0 : 1;
+  renderHGrid();
+  updateHKpi();
+  toast(habits[hi].e, habits[hi].name + (habits[hi].days[d] ? ' selesai!' : ' dibatalkan'), habits[hi].days[d] ? 'g' : 'x');
+}
+
+function updateHKpi() {
+  var done = habits.filter(function(h){ return h.days[4]; }).length;
+  var kpi = document.getElementById('hkpi');
+  if (kpi) kpi.innerHTML = done + '<span style="font-size:13px;color:var(--text3)">/9</span>';
+  var pb = document.getElementById('hpbar');
+  if (pb) pb.style.width = Math.round(done/9*100) + '%';
+  renderHBadges(done);
+}
+
+function renderHBadges() {
+  var el = document.getElementById('hbadges');
+  if (!el) return;
+  el.innerHTML = habits.map(function(h) {
+    var d = h.days[4];
+    return '<span class="badge ' + (d ? 'bg' : 'bx') + '" style="cursor:pointer">' + h.e + ' ' + h.name.split(' ')[0] + (d ? ' ✓' : '') + '</span>';
+  }).join('');
+}
+renderHBadges();
+
+// ══ GOAL LIST ══
+function renderGList() {
+  var el = document.getElementById('glist');
+  if (!el) return;
+  var priMap = {HIGH:'bc',URGENT:'br',MED:'bx',LOW:'bx'};
+  el.innerHTML = goals.map(function(g) {
+    return '<div class="gitem">' +
+      '<div class="ghdr"><span class="gname" style="color:' + g.col + '">' + g.name + '</span>' +
+      '<div style="display:flex;align-items:center;gap:6px"><span class="badge ' + (priMap[g.pri]||'bx') + '" style="font-size:9px">' + g.pri + '</span><span class="gpct">' + g.pct + '%</span></div></div>' +
+      '<div class="pbar"><div class="pfill" style="width:' + g.pct + '%;background:' + g.col + '"></div></div>' +
+      '<div class="gtags"><span class="gtag">' + g.m + ' milestone</span><span class="gtag">' + g.t + ' task</span>' + (g.h ? '<span class="gtag">' + g.h + ' habit</span>' : '') + '</div>' +
+    '</div>';
+  }).join('');
+}
+renderGList();
+
+// ══ KANBAN ══
+function renderKanban() {
+  var bd = document.getElementById('kanban');
+  if (!bd) return;
+  var fil = document.getElementById('kbfil') ? document.getElementById('kbfil').value : 'all';
+  bd.innerHTML = Object.keys(kanbanData).map(function(col) {
+    var c = kanbanData[col];
+    var cards = c.cards.filter(function(k){ return fil === 'all' || k.cat === fil; });
+    return '<div class="kcol">' +
+      '<div class="kcolhdr" style="border-top:2px solid ' + c.col + '">' +
+        '<span style="color:' + c.col + '">' + col + '</span>' +
+        '<span class="kcnt" style="background:' + c.col + '22;color:' + c.col + '">' + c.cnt + '</span>' +
+      '</div>' +
+      '<div class="kcards">' + (cards.length ? cards.map(function(k) {
+        return '<div class="kcard" onclick="toast(\'📋\',\'' + k.t.substring(0,35) + '...\',\'c\')">' +
+          '<div class="kctit">' + k.t + '</div>' +
+          '<div class="kcmeta"><span class="kcag">' + k.ag + '</span>' +
+          '<span class="badge bx" style="font-size:9px">' + k.cat + '</span>' +
+          '<span class="kcdue' + (k.late ? ' late' : '') + '">' + (k.late ? '⚠ ' : '') + k.due + '</span></div>' +
+        '</div>';
+      }).join('') : '<div style="padding:10px;font-size:11px;color:var(--text3);text-align:center">Tidak ada task</div>') + '</div>' +
+    '</div>';
+  }).join('');
+}
+renderKanban();
+
+// ══ AGENTS ══
+function renderAgents() {
+  var el = document.getElementById('agrid');
+  if (!el) return;
+  el.innerHTML = agentData.map(function(a) {
+    var sc = a.name === 'PULSE' ? 'var(--text3)' : 'var(--g)';
+    var st = a.name === 'PULSE' ? 'IDLE' : 'WORKING';
+    return '<div class="acard" style="--ac:' + a.col + '" onclick="toast(\'🤖\',\'' + a.name + ' - ' + a.role + '\',\'c\')">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">' +
+        '<span class="aname" style="color:' + a.col + '">' + a.name + '</span>' +
+        '<span style="font-size:10px;color:' + sc + '">' + st + '</span>' +
+      '</div>' +
+      '<div class="arole">' + a.role + '</div>' +
+      '<div class="atask">' + a.task + '</div>' +
+      '<div class="astats">' +
+        '<div><div class="asv" style="color:var(--g)">' + a.done + '</div><div style="font-size:10px">selesai</div></div>' +
+        '<div><div class="asv" style="color:var(--r)">' + a.blocked + '</div><div style="font-size:10px">blocked</div></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  // War room agent status
+  var ws = document.getElementById('warstatus');
+  if (ws) {
+    ws.innerHTML = agentData.map(function(a) {
+      var sc = a.name === 'PULSE' ? 'var(--text3)' : 'var(--g)';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--bg3);border-radius:var(--rsm)">' +
+        '<span style="font-family:var(--mono);font-weight:800;font-size:12px;color:' + a.col + '">' + a.name + '</span>' +
+        '<span style="font-size:10px;color:' + sc + '">' + a.done + ' done</span>' +
+      '</div>';
+    }).join('');
+  }
+}
+renderAgents();
+
+// ══ COMPANIES ══
+function filco(reg, btn) {
+  document.querySelectorAll('.cofil').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  renderCo(reg);
+}
+
+function renderCo(reg) {
+  var el = document.getElementById('colist');
+  if (!el) return;
+  var filtered = reg === 'all' ? companies
+    : reg === 'hi' ? companies.filter(function(c){ return c.pri === 'HIGH'; })
+    : companies.filter(function(c){ return c.reg === reg; });
+  filtered = filtered.slice().sort(function(a,b){ return b.m - a.m; });
+  var priMap = {HIGH:'hi',MED:'me',LOW:'lo'};
+  el.innerHTML = filtered.map(function(c) {
+    var mc = c.m >= 80 ? 'var(--g)' : c.m >= 65 ? 'var(--y)' : 'var(--text3)';
+    return '<a href="' + c.url + '" target="_blank" rel="noopener" class="cocard">' +
+      '<span style="font-size:13px">' + c.fl + '</span>' +
+      '<span class="codot" style="background:' + c.col + '"></span>' +
+      '<div class="coinfo">' +
+        '<div class="coname">' + c.name + '<span class="cotag ' + (priMap[c.pri]||'lo') + '">' + c.pri + '</span>' + (c.ex ? '<span class="cotag ex">EXPAT OK</span>' : '') + '</div>' +
+        '<div class="cosub">' + c.co + ' &bull; ' + c.role + '</div>' +
+      '</div>' +
+      '<span class="comatch" style="color:' + mc + '">' + c.m + '%</span>' +
+    '</a>';
+  }).join('');
+}
+renderCo('all');
+
+// ══ SKILL GAP ══
+function renderSkillGap() {
+  var el = document.getElementById('sgap');
+  if (!el) return;
+  var priCol = {CRITICAL:'var(--r)',HIGH:'var(--y)',MED:'var(--text3)'};
+  el.innerHTML = '<div style="padding:12px 14px">' + skillGaps.map(function(s) {
+    var gap = s.req - s.lvl;
+    return '<div class="sgitem">' +
+      '<div class="sgrow">' +
+        '<span class="sgname">' + s.name + '</span>' +
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          '<span class="sgpri" style="background:rgba(255,255,255,.05);color:' + (priCol[s.pri]||'var(--text3)') + '">' + s.pri + '</span>' +
+          '<span class="sgvals">' + s.lvl + '&#8594;' + s.req + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sgbar">' +
+        '<div class="sgfill" style="width:' + s.lvl + '%;background:' + s.col + '"></div>' +
+        '<div class="sgmark" style="left:' + s.req + '%"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+// ══ CHARTS ══
+function renderGoalChart() {
+  var el = document.getElementById('ch-goals');
+  if (!el || typeof Highcharts === 'undefined') return;
+  Highcharts.chart(el, {
+    chart:{polar:true,type:'area',backgroundColor:'transparent',margin:[10,10,10,10]},
+    title:{text:null},pane:{size:'80%'},
+    xAxis:{categories:['Akademik','Finansial','Personal','Karier','Kesehatan','Karakter','Relasi','Travel'],tickmarkPlacement:'on',lineWidth:0,labels:{style:{color:'#9aa3b8',fontSize:'10px'}}},
+    yAxis:{gridLineInterpolation:'polygon',min:0,max:100,lineWidth:0,labels:{style:{color:'#5c6680',fontSize:'9px'}}},
+    tooltip:{shared:true,valueSuffix:'%',backgroundColor:'#161b26',borderColor:'#232b3e',style:{color:'#e8ecf4'}},
+    legend:{enabled:false},
+    series:[{name:'Progress',data:[33,25,50,0,0,0,50,0],color:'#00d4ff',fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,'rgba(0,212,255,.28)'],[1,'rgba(0,212,255,.02)']]},lineWidth:2,marker:{symbol:'circle',radius:3}}],
+    credits:{enabled:false},accessibility:{enabled:false}
+  });
+}
+
+function renderSkillRadar() {
+  var el = document.getElementById('ch-skill');
+  if (!el || typeof Highcharts === 'undefined') return;
+  if (!el.offsetParent && el.offsetWidth === 0) return;
+  Highcharts.chart(el, {
+    chart:{polar:true,type:'area',backgroundColor:'transparent',margin:[10,10,10,10]},
+    title:{text:null},pane:{size:'80%'},
+    xAxis:{categories:['Seismic','Petrel','Python','Well Log','AVO','Reservoir','English','Network'],tickmarkPlacement:'on',lineWidth:0,labels:{style:{color:'#9aa3b8',fontSize:'10px'}}},
+    yAxis:{gridLineInterpolation:'polygon',min:0,max:100,lineWidth:0,labels:{style:{color:'#5c6680',fontSize:'9px'}}},
+    tooltip:{shared:true,valueSuffix:'%',backgroundColor:'#161b26',borderColor:'#232b3e',style:{color:'#e8ecf4'}},
+    legend:{itemStyle:{color:'#9aa3b8',fontSize:'10px'}},
+    series:[
+      {name:'Kamu',data:[60,18,55,45,30,25,70,30],color:'#00d4ff',fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,'rgba(0,212,255,.25)'],[1,'rgba(0,212,255,.02)']]},lineWidth:2,marker:{symbol:'circle',radius:3}},
+      {name:'Industri',data:[90,80,80,75,65,70,90,80],color:'#ff4d6a',fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,'rgba(255,77,106,.1)'],[1,'rgba(255,77,106,.01)']]},lineWidth:1.5,dashStyle:'Dash',marker:{symbol:'circle',radius:2}}
+    ],
+    credits:{enabled:false},accessibility:{enabled:false}
+  });
+}
+
+function renderAnalytics() {
+  var dark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var tt = {backgroundColor:dark?'#161b26':'#fff',borderColor:dark?'#232b3e':'#dde1ed',style:{color:dark?'#e8ecf4':'#1a1f2e',fontSize:'11px'}};
+  var days = ['Sen 7','Sel 8','Rab 9','Kam 10','Jum 11'];
+  Highcharts.chart('ch-tasks',{chart:{type:'column',backgroundColor:'transparent'},title:{text:null},xAxis:{categories:days,labels:{style:{color:'#9aa3b8',fontSize:'10px'}},lineColor:'var(--border)'},yAxis:{title:{text:null},labels:{style:{color:'#5c6680',fontSize:'10px'}},gridLineColor:'var(--bg3)'},tooltip:tt,legend:{itemStyle:{color:'#9aa3b8',fontSize:'10px'}},plotOptions:{column:{borderRadius:4}},series:[{name:'Selesai',data:[5,8,3,6,2],color:'#00e5a0'},{name:'Baru masuk',data:[12,9,15,8,18],color:'#00d4ff'}],credits:{enabled:false},accessibility:{enabled:false}});
+  Highcharts.chart('ch-habits',{chart:{type:'bar',backgroundColor:'transparent'},title:{text:null},xAxis:{categories:habits.map(function(h){return h.e+' '+h.name;}),labels:{style:{color:'#9aa3b8',fontSize:'10px'}},lineColor:'var(--border)'},yAxis:{max:7,title:{text:null},labels:{style:{color:'#5c6680',fontSize:'10px'}},gridLineColor:'var(--bg3)'},tooltip:tt,legend:{enabled:false},plotOptions:{bar:{borderRadius:3,dataLabels:{enabled:true,style:{color:'#9aa3b8',fontSize:'10px',fontWeight:'normal',textOutline:'none'},format:'{y}/7'}}},series:[{name:'Check-in',data:[0,0,0,0,0,0,1,0,0],color:'#00d4ff'}],credits:{enabled:false},accessibility:{enabled:false}});
+  Highcharts.chart('ch-cats',{chart:{type:'pie',backgroundColor:'transparent'},title:{text:null},tooltip:tt,plotOptions:{pie:{innerSize:'55%',borderWidth:2,borderColor:dark?'#0d0f14':'#f0f2f7',dataLabels:{style:{color:'#9aa3b8',fontSize:'10px',textOutline:'none'}}}},series:[{name:'Tasks',data:[{name:'Kuliah',y:34,color:'#00d4ff'},{name:'Finansial',y:28,color:'#00e5a0'},{name:'Karier',y:20,color:'#9b7cff'},{name:'Kesehatan',y:12,color:'#ff4d6a'},{name:'Lainnya',y:6,color:'#ffb84d'}]}],credits:{enabled:false},accessibility:{enabled:false}});
+  Highcharts.chart('ch-goals2',{chart:{type:'bar',backgroundColor:'transparent'},title:{text:null},xAxis:{categories:goals.map(function(g){return g.name;}),labels:{style:{color:'#9aa3b8',fontSize:'10px'}},lineColor:'var(--border)'},yAxis:{max:100,title:{text:null},labels:{format:'{value}%',style:{color:'#5c6680',fontSize:'10px'}},gridLineColor:'var(--bg3)'},tooltip:Object.assign({valueSuffix:'%'},tt),legend:{enabled:false},plotOptions:{bar:{borderRadius:3,dataLabels:{enabled:true,format:'{y}%',style:{color:'#9aa3b8',fontSize:'10px',fontWeight:'normal',textOutline:'none'}}}},series:[{name:'Progress',data:goals.map(function(g){return {y:g.pct,color:g.col};})}],credits:{enabled:false},accessibility:{enabled:false}});
+}
+
+// ══ JOURNAL ══
+function mood(btn) { document.querySelectorAll('.mbtn').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); }
+function saveJournal() {
+  var ta = document.querySelectorAll('#pg-journal textarea');
+  var filled = 0;
+  ta.forEach(function(t){ if (t.value.trim()) filled++; });
+  if (!filled) { toast('⚠️','Tulis minimal satu field','y'); return; }
+  toast('📝','Refleksi tersimpan!','g');
+}
+
+// ══ WAR ROOM ══
+function sendW() {
+  var inp = document.getElementById('winput');
+  var chat = document.getElementById('wchat');
+  if (!inp || !chat || !inp.value.trim()) return;
+  var msg = inp.value.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var ts = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  chat.innerHTML += '<div class="wmsg own"><div class="wfrom">OWNER ' + ts + '</div><div class="wtxt">' + msg + '</div></div>';
+  inp.value = '';
+  inp.focus();
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(function() {
+    var r = warR[warIdx % warR.length]; warIdx++;
+    var rts = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    chat.innerHTML += '<div class="wmsg agt"><div class="wfrom">' + r[0] + ' ' + rts + '</div><div class="wtxt">' + r[1] + '</div></div>';
+    chat.scrollTop = chat.scrollHeight;
+    toast('🤖', r[0] + ' membalas', 'g');
+  }, 900);
+}
+
+// ══ TASK CHECK ══
+function chk(item) {
+  var c = item.querySelector('.chk');
+  var t = item.querySelector('.ttxt');
+  if (!c) return;
+  var done = c.classList.toggle('done');
+  if (t) t.classList.toggle('done', done);
+  toast(done ? '✅' : '↩️', done ? 'Task selesai!' : 'Task dibuka', done ? 'g' : 'x');
+}
+
+// ══ TOAST ══
+var tcols = {c:'var(--cd)',g:'var(--gd)',y:'var(--yd)',r:'var(--rd)',x:'var(--bg3)'};
+function toast(icon, msg, type) {
+  var wrap = document.getElementById('toasts');
+  var el   = document.createElement('div');
+  el.className = 'toast';
+  el.style.background = tcols[type] || tcols.c;
+  el.innerHTML = '<span style="font-size:14px">' + icon + '</span><span>' + msg + '</span>';
+  wrap.appendChild(el);
+  setTimeout(function(){ if (el.parentElement) el.parentElement.removeChild(el); }, 3000);
+}
+
+// ══ THEME ══
+var dark = (document.documentElement.getAttribute('data-theme') !== 'light');
+function toggleTheme() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.innerHTML = dark ? '&#9790;' : '&#9728;';
+  toast(dark ? '🌙' : '☀️', dark ? 'Dark mode' : 'Light mode', 'c');
+}
+
+// ══ NOTIF ══
+var notifOpen = false;
+function toggleNotif() { notifOpen = !notifOpen; toast('🔔', notifOpen ? '3 notifikasi baru' : 'Notifikasi ditutup', 'c'); }
+
+// ══ KEYBOARD ══
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); toast('🔍','Search: ketik di atas','c'); }
+});
+</script>
+</body>
+</html>

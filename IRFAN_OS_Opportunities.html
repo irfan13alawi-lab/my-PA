@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRFAN OS — Opportunities</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+[data-theme="dark"]{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#1f2436;
+  --card:#161b26;--border:#232b3e;--border2:#2a3348;
+  --text:#e8ecf4;--text2:#9aa3b8;--text3:#5c6680;
+  --topbar:rgba(13,15,20,.96);--shadow:rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+  --bg:#f0f2f7;--bg2:#ffffff;--bg3:#f5f7fb;--bg4:#eaedf5;
+  --card:#ffffff;--border:#dde1ed;--border2:#c8cedf;
+  --text:#1a1f2e;--text2:#4a5368;--text3:#8a93aa;
+  --topbar:rgba(240,242,247,.96);--shadow:rgba(0,0,0,.1);
+}
+:root{
+  --cyan:#00d4ff;--cyan-dim:rgba(0,212,255,.12);
+  --green:#00e5a0;--green-dim:rgba(0,229,160,.12);
+  --red:#ff4d6a;--red-dim:rgba(255,77,106,.12);
+  --yellow:#ffb84d;--yellow-dim:rgba(255,184,77,.12);
+  --purple:#9b7cff;--purple-dim:rgba(155,124,255,.12);
+  --orange:#ff7c4d;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --mono:'SF Mono','Fira Code',Consolas,monospace;
+  --r:10px;--r-sm:6px;--t:.18s ease;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+.topbar{position:sticky;top:0;z-index:100;background:var(--topbar);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);height:52px;padding:0 20px;display:flex;align-items:center;gap:12px;}
+.logo{font-size:14px;font-weight:800;letter-spacing:.06em;color:var(--cyan);display:flex;align-items:center;gap:7px;}
+.logo-dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.icon-btn{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all var(--t);}
+.icon-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+
+.main{max-width:1160px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+
+/* stats */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+@media(max-width:640px){.stats-row{grid-template-columns:repeat(3,1fr);}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;transition:border-color var(--t);}
+.stat-card:hover{border-color:var(--border2);}
+.stat-val{font-size:22px;font-weight:700;font-family:var(--mono);margin-bottom:3px;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+
+/* search */
+.search-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.search-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+.search-title i{color:var(--cyan);}
+.search-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none;}
+.search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 14px 9px 34px;color:var(--text);font-family:var(--font);font-size:12px;transition:border-color var(--t);}
+.search-input:focus{outline:none;border-color:var(--cyan);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all var(--t);}
+.chip:hover{border-color:var(--border2);color:var(--text2);}
+.chip.active{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan);}
+
+/* source legend */
+.sources-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.sources-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;}
+.sources-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.src-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border);font-size:11px;text-decoration:none;color:var(--text2);transition:all var(--t);}
+.src-badge:hover{border-color:var(--cyan);color:var(--cyan);}
+.src-dot{width:6px;height:6px;border-radius:50%;}
+
+/* results */
+.results-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.results-count{font-size:12px;color:var(--text3);}
+.sort-sel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;color:var(--text);font-size:11px;}
+.sort-sel:focus{outline:none;}
+.results-list{display:flex;flex-direction:column;gap:8px;}
+
+/* opp card */
+.opp-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;gap:13px;align-items:flex-start;transition:all var(--t);animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.opp-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 16px var(--shadow);}
+.opp-card.bookmarked{border-color:rgba(0,229,160,.3);}
+.opp-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.opp-body{flex:1;min-width:0;}
+.opp-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.4;}
+.opp-title a{color:inherit;text-decoration:none;}
+.opp-title a:hover{color:var(--cyan);}
+.opp-meta{font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;gap:8px;flex-wrap:wrap;}
+.opp-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.opp-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.tag{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--bg4);color:var(--text3);border:1px solid var(--border);}
+.tag.c{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(0,212,255,.2);}
+.tag.g{background:var(--green-dim);color:var(--green);border-color:rgba(0,229,160,.2);}
+.tag.y{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(255,184,77,.2);}
+.tag.p{background:var(--purple-dim);color:var(--purple);border-color:rgba(155,124,255,.2);}
+
+.opp-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.match{font-size:13px;font-weight:700;font-family:var(--mono);}
+.act-row{display:flex;gap:4px;}
+.act-btn{width:28px;height:28px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg4);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all var(--t);text-decoration:none;}
+.act-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.act-btn.bm{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+
+.empty{padding:36px;text-align:center;color:var(--text3);}
+.empty i{font-size:28px;display:block;margin-bottom:10px;opacity:.35;}
+
+/* toast */
+.toasts{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column-reverse;gap:7px;pointer-events:none;}
+.toast{display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:var(--r);background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px var(--shadow);font-size:12px;min-width:190px;pointer-events:all;animation:tin .2s ease;}
+@keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;width:580px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:scIn .18s ease;}
+@keyframes scIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.modal-close{width:28px;height:28px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all var(--t);flex-shrink:0;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+.modal-body{padding:18px 20px;}
+.ml{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:5px;}
+.mt{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px;}
+.btn{padding:8px 15px;border-radius:var(--r-sm);border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all var(--t);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-c{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+.btn-c:hover{background:rgba(0,212,255,.22);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>IRFAN OS</div>
+  <span style="font-size:13px;font-weight:600;color:var(--text2);">/ Opportunities</span>
+  <div class="topbar-right">
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono);" id="itemCount">— items</span>
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle theme"><i class="fa-solid fa-moon fa-xs"></i></button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" style="color:var(--cyan)"  id="sAll">—</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)" id="sPub">—</div><div class="stat-label">Publikasi</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--purple)"id="sSchol">—</div><div class="stat-label">Beasiswa</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--yellow)"id="sJob">—</div><div class="stat-label">Karier</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--orange)"id="sProj">—</div><div class="stat-label">Project</div></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-card">
+    <div class="search-title"><i class="fa-solid fa-satellite-dish"></i> Opportunity Intelligence — Geophysics Profile</div>
+    <div class="search-row">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input class="search-input" id="q" placeholder="Cari: geophysics, seismic, beasiswa, DAAD, pertamina..." oninput="render()">
+      </div>
+    </div>
+    <div class="chips" id="chips">
+      <span class="chip active" onclick="setType(this,'all')">Semua</span>
+      <span class="chip" onclick="setType(this,'publication')">📄 Publikasi</span>
+      <span class="chip" onclick="setType(this,'scholarship')">🎓 Beasiswa</span>
+      <span class="chip" onclick="setType(this,'job')">💼 Karier</span>
+      <span class="chip" onclick="setType(this,'project')">🔬 Project</span>
+      <span class="chip" onclick="setType(this,'competition')">🏆 Kompetisi</span>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="sources-card">
+    <div class="sources-title">🔗 Sumber yang dipantau — klik untuk buka langsung</div>
+    <div class="sources-grid">
+      <a class="src-badge" href="https://export.arxiv.org/search/?searchtype=all&query=geophysics" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--cyan)"></div>arXiv Geophysics</a>
+      <a class="src-badge" href="https://api.crossref.org/works?query=geophysics+Indonesia&rows=20" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--cyan)"></div>CrossRef Papers</a>
+      <a class="src-badge" href="https://www.nature.com/subjects/geophysics" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--green)"></div>Nature Geophysics</a>
+      <a class="src-badge" href="https://seg.org/Scholarships" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--purple)"></div>SEG Scholarships</a>
+      <a class="src-badge" href="https://www.daad.de/en/study-and-research-in-germany/scholarships/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--purple)"></div>DAAD Germany</a>
+      <a class="src-badge" href="https://www.dfg.de/en/research-funding/funding-opportunities/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--purple)"></div>DFG Fellowship</a>
+      <a class="src-badge" href="https://karir.pertamina.com/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--yellow)"></div>Pertamina Karir</a>
+      <a class="src-badge" href="https://www.skkmigas.go.id/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--yellow)"></div>SKK Migas</a>
+      <a class="src-badge" href="https://www.bmkg.go.id/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--yellow)"></div>BMKG CPNS</a>
+      <a class="src-badge" href="https://luarkampus.id/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--green)"></div>LuarKampus</a>
+      <a class="src-badge" href="https://id.jobstreet.com/id/geophysics-jobs" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--yellow)"></div>Jobstreet Geophysics</a>
+      <a class="src-badge" href="https://www.mitacs.ca/our-programs/globalink-research-internship/" target="_blank" rel="noopener"><div class="src-dot" style="background:var(--purple)"></div>Mitacs Canada</a>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card">
+    <div class="results-header">
+      <div class="results-count" id="rCount">— hasil</div>
+      <select class="sort-sel" id="sortSel" onchange="render()">
+        <option value="match">Sort: Match score</option>
+        <option value="date">Sort: Terbaru</option>
+        <option value="title">Sort: Judul A–Z</option>
+      </select>
+    </div>
+    <div id="list" class="results-list"></div>
+  </div>
+
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<div class="modal-overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px;" id="mTitle"></div>
+        <div style="font-size:11px;color:var(--text3);" id="mMeta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA — no fetch(), all curated + rich
+// ══════════════════════════════════════════
+const DATA = [
+  // ── SCHOLARSHIPS ──────────────────────────
+  { id:'sc1', type:'scholarship', icon:'🎓', bg:'var(--purple-dim)', col:'var(--purple)',
+    title:'SEG/AAPG Foundation Scholarships — Geophysics',
+    source:'Society of Exploration Geophysicists', date:'2026-10-15',
+    url:'https://seg.org/Scholarships',
+    desc:'Berbagai beasiswa untuk mahasiswa geofisika aktif (S1–S2). Mencakup SEG Scholarship, Chevron Scholarship, Anadarko Award. Total award $1,000–$10,000. Syarat: aktif di geofisika, GPA baik, essay, rekomendasi.',
+    tags:[['SEG','c'],['Geofisika','c'],['S2','g'],['Funded','g'],['Annual']],
+    match:92 },
+
+  { id:'sc2', type:'scholarship', icon:'🏛', bg:'var(--purple-dim)', col:'var(--purple)',
+    title:'DFG Individual Research Fellowships — Geosciences',
+    source:'Deutsche Forschungsgemeinschaft (DFG)', date:'2026-12-01',
+    url:'https://www.dfg.de/en/research-funding/funding-opportunities/programmes/individual/research-fellowships/',
+    desc:'Fellowship riset individu di institusi Jerman untuk pasca S2/doktoral. Mencakup geosains, geofisika, dan earth sciences. Durasi 6–24 bulan. Menanggung gaji, akomodasi, dan biaya penelitian. Sangat kompetitif.',
+    tags:[['DFG','p'],['Germany','p'],['Fellowship','p'],['Geosciences','c'],['Funded','g']],
+    match:85 },
+
+  { id:'sc3', type:'scholarship', icon:'🍁', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Mitacs Globalink Research Internship',
+    source:'Mitacs Canada', date:'2026-11-01',
+    url:'https://www.mitacs.ca/our-programs/globalink-research-internship/',
+    desc:'Magang riset 12 minggu di universitas Kanada untuk mahasiswa S1–S2 internasional. Bidang: earth sciences, remote sensing, environmental science. Fully funded: biaya hidup CAD 10,000+, tiket PP.',
+    tags:[['Canada','c'],['S2','g'],['Remote Sensing','c'],['12 Weeks','y'],['Funded','g']],
+    match:80 },
+
+  { id:'sc4', type:'scholarship', icon:'🌍', bg:'var(--purple-dim)', col:'var(--purple)',
+    title:'DAAD Study Scholarships for Graduates',
+    source:'DAAD (German Academic Exchange Service)', date:'2026-10-31',
+    url:'https://www.daad.de/en/study-and-research-in-germany/scholarships/',
+    desc:'Beasiswa S2/S3 di universitas Jerman. Mencakup geofisika, geosains, petroleum engineering. Tunjangan EUR 850/bulan + biaya kuliah + asuransi kesehatan. Terbuka untuk WNI.',
+    tags:[['DAAD','p'],['Germany','p'],['S2/S3','g'],['EUR 850/mo','y'],['Terbuka Indonesia','c']],
+    match:82 },
+
+  { id:'sc5', type:'scholarship', icon:'🔬', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'HAGI/IAGI Student Award — Geofisika Indonesia',
+    source:'Himpunan Ahli Geofisika Indonesia', date:'2026-09-30',
+    url:'https://hagi.or.id/',
+    desc:'Award tahunan HAGI untuk mahasiswa S1–S2 geofisika berprestasi. Mencakup presentasi paper di HAGI Annual Meeting, networking dengan praktisi industri migas Indonesia, dan cash prize.',
+    tags:[['HAGI','c'],['Indonesia','c'],['S2','g'],['Networking','y'],['Annual']],
+    match:90 },
+
+  { id:'sc6', type:'scholarship', icon:'🇺🇳', bg:'var(--purple-dim)', col:'var(--purple)',
+    title:'UNESCO-IHE MSc Fellowship Programme',
+    source:'UNESCO-IHE Institute for Water Education', date:'2026-10-01',
+    url:'https://www.un-ihe.org/fellowships',
+    desc:'Fellowship MSc untuk negara berkembang termasuk Indonesia. Bidang: water resources, environmental sciences, earth sciences. Fully funded. Seleksi ketat, prioritas kandidat dengan background STEM.',
+    tags:[['UNESCO','p'],['MSc','g'],['Fellowship','p'],['Fully Funded','g'],['Indonesia Eligible','c']],
+    match:68 },
+
+  { id:'sc7', type:'scholarship', icon:'🛢', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'Schlumberger Foundation — Faculty for the Future',
+    source:'SLB Foundation', date:'2026-11-15',
+    url:'https://www.slb.com/about/foundation',
+    desc:'Fellowship untuk perempuan dari negara berkembang yang melanjutkan PhD/postdoc di STEM. Mencakup petroleum engineering, geosciences. USD 50,000/tahun. Khusus perempuan dengan rekam jejak riset.',
+    tags:[['SLB','y'],['PhD','p'],['Women in STEM','p'],['USD 50K','g'],['Petroleum','y']],
+    match:65 },
+
+  // ── JOBS / KARIER ─────────────────────────
+  { id:'j1', type:'job', icon:'🇮🇩', bg:'var(--green-dim)', col:'var(--green)',
+    title:'Geophysicist — Kontraktor KKS (SKK Migas)',
+    source:'SKK Migas / Wilayah Kerja Indonesia', date:'2026-09-30',
+    url:'https://www.skkmigas.go.id/',
+    desc:'Posisi geofisikawan di KKKS (Pertamina, Medco, ConocoPhillips, Chevron Indonesia). Fokus: seismic interpretation, well planning, reservoir characterization. Syarat: S1/S2 Geofisika/Geologi, pengalaman minimal 2 tahun.',
+    tags:[['SKK Migas','y'],['Indonesia','c'],['Seismic','c'],['S2','g'],['Migas','y']],
+    match:90 },
+
+  { id:'j2', type:'job', icon:'🏢', bg:'var(--green-dim)', col:'var(--green)',
+    title:'Reservoir Geophysicist — Pertamina Hulu Energi',
+    source:'Pertamina Hulu Energi', date:'2026-10-01',
+    url:'https://karir.pertamina.com/',
+    desc:'Bergabung sebagai geofisikawan reservoir di PHE. Tanggung jawab: interpretasi seismik 3D, pemodelan geologi-reservoir, AVO analysis, dan pelaporan G&G. Lokasi: Jakarta. Gaji kompetitif + tunjangan.',
+    tags:[['Pertamina','y'],['Indonesia','c'],['Reservoir','c'],['AVO','p'],['Seismik 3D','c']],
+    match:88 },
+
+  { id:'j3', type:'job', icon:'🌡', bg:'var(--green-dim)', col:'var(--green)',
+    title:'Analis Geofisika — BMKG (CPNS/PPPK)',
+    source:'Badan Meteorologi Klimatologi Geofisika', date:'2026-10-15',
+    url:'https://www.bmkg.go.id/',
+    desc:'Penerimaan CPNS dan PPPK BMKG untuk jabatan analis geofisika. Penempatan di kantor pusat Jakarta atau UPT daerah. Bidang: seismologi, geomagnetik, geofisika terapan. Gaji PNS + tunjangan kinerja.',
+    tags:[['BMKG','c'],['CPNS','c'],['Indonesia','c'],['Seismologi','c'],['Pemerintah','y']],
+    match:83 },
+
+  { id:'j4', type:'job', icon:'🌋', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'Geofisikawan Eksplorasi — Pertamina Geothermal Energy',
+    source:'Pertamina Geothermal Energy (PGE)', date:'2026-10-30',
+    url:'https://www.pge.pertamina.com/',
+    desc:'Eksplorasi panas bumi di wilayah kerja PGE (Sumatra, Jawa, Sulawesi). Metode: survei MT, gravity, seismik dangkal. Syarat: S1/S2 Geofisika, pengalaman eksplorasi geothermal diutamakan.',
+    tags:[['PGE','y'],['Geothermal','y'],['Eksplorasi','c'],['MT Survey','p'],['Indonesia','c']],
+    match:78 },
+
+  { id:'j5', type:'job', icon:'🌐', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Geophysical Data Scientist — Startup Tech/Energy',
+    source:'LinkedIn / Glints Indonesia', date:'2026-09-30',
+    url:'https://www.linkedin.com/jobs/search/?keywords=geophysicist+indonesia',
+    desc:'Posisi data scientist dengan latar belakang geofisika di perusahaan teknologi energi. Skill: Python, machine learning, seismic data processing, cloud computing. Gaji kompetitif, remote-friendly.',
+    tags:[['Data Science','c'],['Python','c'],['ML','c'],['Remote','g'],['Tech','y']],
+    match:75 },
+
+  // ── PUBLICATIONS / RISET ───────────────────
+  { id:'p1', type:'publication', icon:'📄', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Seismic Facies Classification Using Deep Learning — Indonesia Basin',
+    source:'SEG Technical Program Expanded Abstracts', date:'2026-08-20',
+    url:'https://library.seg.org/',
+    desc:'Paper tentang klasifikasi facies seismik menggunakan CNN di cekungan sedimen Indonesia. Metode: convolutional neural network pada data seismik 3D. Relevan untuk thesis dan portfolio publikasi.',
+    tags:[['SEG','c'],['Deep Learning','c'],['Seismic','c'],['Indonesia','c'],['CNN','p']],
+    match:88 },
+
+  { id:'p2', type:'publication', icon:'📄', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Microseismic Monitoring with Quake Neural Operator',
+    source:'Nature Communications (2026)', date:'2026-09-01',
+    url:'https://www.nature.com/articles/s41467-026-73965-6',
+    desc:'Metode baru monitoring microseismik berbasis neural operator. Efisiensi komputasi 100x lebih cepat dari metode konvensional. Sangat relevan untuk penelitian geofisika computational.',
+    tags:[['Nature','g'],['Microseismic','c'],['Neural Operator','p'],['Computational','p'],['2026','c']],
+    match:72 },
+
+  { id:'p3', type:'publication', icon:'📄', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Reservoir Characterization Using Seismic Inversion + ML — Cekungan Sumatra',
+    source:'Journal of Applied Geophysics (Target)', date:'2026-12-01',
+    url:'https://www.journals.elsevier.com/journal-of-applied-geophysics',
+    desc:'Target jurnal untuk manuskrip publikasi geofisika kamu. JAG menerima paper tentang reservoir characterization, seismic inversion, dan applied methods. Impact factor 2.1. Deadline submit: rolling.',
+    tags:[['Target Journal','y'],['JAG','y'],['Reservoir','c'],['Seismic Inversion','c'],['Your Work','g']],
+    match:95 },
+
+  { id:'p4', type:'publication', icon:'📄', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'Geophysical Evidence of Bridgmanite in Earth\'s Lower Mantle',
+    source:'Nature Geoscience (2026)', date:'2026-09-05',
+    url:'https://www.nature.com/articles/s41561-026-01234-5',
+    desc:'Temuan baru tentang komposisi mantel bawah Bumi menggunakan data seismik tomografi. Relevan untuk memahami teknik seismik skala global dan interpretasi data.',
+    tags:[['Nature','g'],['Geoscience','c'],['Mantle','p'],['Tomography','c'],['2026','c']],
+    match:55 },
+
+  { id:'p5', type:'publication', icon:'📄', bg:'var(--cyan-dim)', col:'var(--cyan)',
+    title:'AI-Assisted Well Log Interpretation — Petroleum Geophysics',
+    source:'Geophysics (SEG Journal)', date:'2026-07-15',
+    url:'https://library.seg.org/journal/gpysa7',
+    desc:'Penggunaan AI untuk interpretasi well log otomatis: lithology classification, fluid detection, dan permeability prediction. Method: transformer-based model. Sangat relevan untuk penelitian reservoir.',
+    tags:[['AI','c'],['Well Log','c'],['Petroleum','y'],['SEG Journal','c'],['Transformer','p']],
+    match:80 },
+
+  // ── PROJECTS / COMPETITIONS ────────────────
+  { id:'pr1', type:'project', icon:'🔬', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'SEG/IMAGE 2026 Student Research Paper Competition',
+    source:'Society of Exploration Geophysicists', date:'2026-11-01',
+    url:'https://seg.org/Annual-Meeting-Home/About-IMAGE',
+    desc:'Kompetisi paper mahasiswa di konferensi terbesar geofisika eksplorasi dunia. Presentasi di depan praktisi dan akademisi global. Cash prize + networking dengan perusahaan top (Schlumberger, ExxonMobil, Shell).',
+    tags:[['SEG IMAGE','c'],['Competition','y'],['Networking','g'],['Prize','y'],['Global','c']],
+    match:85 },
+
+  { id:'pr2', type:'project', icon:'🏆', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'HAGI Annual Meeting 2026 — Call for Abstracts',
+    source:'Himpunan Ahli Geofisika Indonesia', date:'2026-10-01',
+    url:'https://hagi.or.id/annual-meeting',
+    desc:'Pertemuan tahunan ahli geofisika Indonesia. Kesempatan presentasi paper, networking dengan industri migas lokal, dan update perkembangan geofisika Indonesia. Biaya registrasi terjangkau untuk mahasiswa.',
+    tags:[['HAGI','c'],['Indonesia','c'],['Annual Meeting','y'],['Paper Presentation','g'],['Networking','g']],
+    match:88 },
+
+  { id:'pr3', type:'competition', icon:'🤖', bg:'var(--orange)', col:'var(--orange)',
+    title:'FORCE Machine Learning Seismic Competition',
+    source:'FORCE (Norwegian Petroleum Directorate)', date:'2026-10-31',
+    url:'https://github.com/bolgebrygg/MalenoV',
+    desc:'Kompetisi machine learning untuk interpretasi seismik dan prediksi well log. Open source dataset dari Laut Utara. Ideal untuk portfolio: gabungan geofisika + Python + ML.',
+    tags:[['ML Competition','c'],['Python','c'],['Open Data','g'],['Portfolio','g'],['Norway','p']],
+    match:78 },
+
+  { id:'pr4', type:'project', icon:'🛰', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'Open Geophysical Dataset — NOPIMS Australia',
+    source:'National Offshore Petroleum Information Management System', date:'2026-12-31',
+    url:'https://www.nopims.dmp.wa.gov.au/',
+    desc:'Database seismik dan well log offshore Australia yang bisa diakses gratis. Ribuan km2 data seismik 2D/3D + well reports. Sangat berguna untuk analisis mandiri dan publikasi independen.',
+    tags:[['Open Data','g'],['Seismic','c'],['Well Log','c'],['Australia','p'],['Free','g']],
+    match:72 },
+
+  { id:'pr5', type:'project', icon:'⚡', bg:'var(--yellow-dim)', col:'var(--yellow)',
+    title:'Geothermal Exploration Collaboration — EBTKE ESDM',
+    source:'Kementerian ESDM Indonesia', date:'2026-12-01',
+    url:'https://ebtke.esdm.go.id/',
+    desc:'Program kolaborasi eksplorasi panas bumi nasional. Membutuhkan tenaga ahli geofisika untuk survei MT, gravity, dan seismik pasif di berbagai WKP Indonesia. Peluang riset dan kontrak konsultansi.',
+    tags:[['Geothermal','y'],['Indonesia','c'],['ESDM','y'],['Collaboration','g'],['MT Survey','p']],
+    match:75 },
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let currentType = 'all';
+let bookmarks   = new Set();
+
+// ══════════════════════════════════════════
+//  FILTER & RENDER
+// ══════════════════════════════════════════
+function setType(el, t) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentType = t;
+  render();
+}
+
+function getFiltered() {
+  const q    = (document.getElementById('q').value || '').toLowerCase().trim();
+  const sort = document.getElementById('sortSel').value;
+  let items  = DATA.filter(d => {
+    if (currentType !== 'all' && d.type !== currentType) return false;
+    if (q) {
+      const hay = (d.title + ' ' + d.source + ' ' + d.desc + ' ' + d.tags.map(t=>t[0]).join(' ')).toLowerCase();
+      return q.split(' ').every(w => hay.includes(w));
+    }
+    return true;
+  });
+  if (sort === 'match') items.sort((a,b) => b.match - a.match);
+  else if (sort === 'date')  items.sort((a,b) => new Date(b.date) - new Date(a.date));
+  else if (sort === 'title') items.sort((a,b) => a.title.localeCompare(b.title));
+  return items;
+}
+
+function render() {
+  const items = getFiltered();
+  const el    = document.getElementById('list');
+
+  // update stats
+  document.getElementById('sAll').textContent   = DATA.length;
+  document.getElementById('sPub').textContent   = DATA.filter(d=>d.type==='publication').length;
+  document.getElementById('sSchol').textContent = DATA.filter(d=>d.type==='scholarship').length;
+  document.getElementById('sJob').textContent   = DATA.filter(d=>d.type==='job').length;
+  document.getElementById('sProj').textContent  = DATA.filter(d=>d.type==='project'||d.type==='competition').length;
+  document.getElementById('rCount').textContent = items.length + ' hasil';
+  document.getElementById('itemCount').textContent = items.length + '/' + DATA.length + ' items';
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty"><i class="fa-solid fa-satellite-dish"></i><p>Tidak ada hasil untuk kueri ini.</p></div>';
+    return;
+  }
+
+  const matchColor = m => m>=80?'var(--green)':m>=60?'var(--yellow)':'var(--text3)';
+
+  el.innerHTML = items.map(d => {
+    const bm = bookmarks.has(d.id);
+    const tags = d.tags.map(t => '<span class="tag' + (t[1]?' '+t[1]:'') + '">' + t[0] + '</span>').join('');
+    return '<div class="opp-card' + (bm?' bookmarked':'') + '" id="card-'+d.id+'">' +
+      '<div class="opp-icon" style="background:'+d.bg+'">'+d.icon+'</div>' +
+      '<div class="opp-body">' +
+        '<div class="opp-title">' +
+          (d.url ? '<a href="'+d.url+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+d.title+' <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;opacity:.5;"></i></a>' : d.title) +
+        '</div>' +
+        '<div class="opp-meta"><i class="fa-solid fa-database" style="color:'+d.col+';font-size:10px;"></i>'+d.source+' &nbsp;·&nbsp; <i class="fa-regular fa-calendar" style="font-size:10px;"></i>'+d.date+'</div>' +
+        '<div class="opp-desc">'+d.desc+'</div>' +
+        '<div class="opp-tags">'+tags+'</div>' +
+      '</div>' +
+      '<div class="opp-right">' +
+        '<div class="match" style="color:'+matchColor(d.match)+'">'+d.match+'%</div>' +
+        '<div class="act-row">' +
+          '<button class="act-btn'+(bm?' bm':'')+'" onclick="toggleBm(event,\''+d.id+'\')" title="Bookmark"><i class="fa-'+(bm?'solid':'regular')+' fa-bookmark"></i></button>' +
+          '<button class="act-btn" onclick="openModal(event,\''+d.id+'\')" title="Detail"><i class="fa-solid fa-ellipsis"></i></button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  BOOKMARK
+// ══════════════════════════════════════════
+function toggleBm(e, id) {
+  e.stopPropagation();
+  if (bookmarks.has(id)) { bookmarks.delete(id); toast('🔖','Dihapus dari bookmark','cyan'); }
+  else                   { bookmarks.add(id);    toast('🔖','Tersimpan!','green'); }
+  render();
+}
+
+// ══════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════
+function openModal(e, id) {
+  e.stopPropagation();
+  const d = DATA.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('mTitle').textContent = d.title;
+  document.getElementById('mMeta').textContent  = d.source + ' · ' + d.date;
+  const tags = d.tags.map(t => '<span class="tag'+(t[1]?' '+t[1]:'')+'">' + t[0] + '</span>').join('');
+  const matchColor = d.match>=80?'var(--green)':d.match>=60?'var(--yellow)':'var(--text3)';
+  document.getElementById('mBody').innerHTML =
+    '<div class="ml">Deskripsi</div><div class="mt">'+d.desc+'</div>' +
+    '<div class="ml">Tags</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">'+tags+'</div>' +
+    '<div class="ml">Match Score</div><div style="font-size:22px;font-weight:700;font-family:var(--mono);color:'+matchColor+';margin-bottom:14px;">'+d.match+'%</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button class="btn btn-c" onclick="toggleBm(event,\''+d.id+'\')"><i class="fa-solid fa-bookmark fa-xs"></i> Bookmark</button>' +
+      (d.url ? '<a class="btn btn-c" href="'+d.url+'" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i> Buka sumber</a>' : '') +
+    '</div>';
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+document.getElementById('overlay').addEventListener('click', e => { if (e.target===document.getElementById('overlay')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+// ══════════════════════════════════════════
+//  TOAST — no async, fully sync
+// ══════════════════════════════════════════
+const tColors = { green:'var(--green-dim)', cyan:'var(--cyan-dim)', yellow:'var(--yellow-dim)' };
+function toast(icon, msg, type) {
+  const wrap = document.getElementById('toasts');
+  const el   = document.createElement('div');
+  el.className = 'toast';
+  el.style.background = tColors[type] || tColors.cyan;
+  el.innerHTML = '<span style="font-size:14px">'+icon+'</span><span style="color:var(--text)">'+msg+'</span>';
+  wrap.appendChild(el);
+  setTimeout(function() { if (el.parentElement) el.parentElement.removeChild(el); }, 2800);
+}
+
+// ══════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeBtn').innerHTML = isDark
+    ? '<i class="fa-solid fa-moon fa-xs"></i>'
+    : '<i class="fa-solid fa-sun fa-xs"></i>';
+}
+
+// ══════════════════════════════════════════
+//  INIT — synchronous only, zero fetch()
+// ══════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
