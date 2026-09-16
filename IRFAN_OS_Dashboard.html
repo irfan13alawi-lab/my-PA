@@ -2038,5 +2038,200 @@ function nav(id, btn) {
   document.addEventListener('habitStateChanged',function(){upgradeRenderToday();upgradeRenderWarRoom();});
 })();
 </script>
+<script>
+// IRFAN OS SERVER SYNC + TASK OPERATIONS
+(function () {
+  'use strict';
+  var backendAvailable = false;
+  var backendSyncBusy = false;
+  var backendLastSnapshot = '';
+  var backendTimer = null;
+
+  function backendRead(key, fallback) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+  }
+  function backendWrite(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+  function backendHabitLogs() {
+    var logs = {};
+    try { for (var i = 0; i < localStorage.length; i++) { var key = localStorage.key(i); if (key && key.indexOf('habit_') === 0) logs[key] = localStorage.getItem(key); } } catch (e) {}
+    return logs;
+  }
+  function backendSnapshot() {
+    return {
+      tasks: Array.isArray(window.TASKS) ? window.TASKS : [],
+      goals: Array.isArray(window.goals) ? window.goals : [],
+      habits: Array.isArray(window.habits) ? window.habits : [],
+      habitLogs: backendHabitLogs(),
+      journalEntries: backendRead('irfan_os_journal_entries', []),
+      bookmarks: backendRead('irfan_os_bookmarks', []),
+      opportunities: backendRead('irfan_os_opportunities', []),
+      opportunityPipeline: backendRead('irfan_os_opportunity_pipeline', {}),
+      warChat: backendRead('irfan_os_war_chat', []),
+      settings: { theme: localStorage.getItem('irfan_os_theme') || 'light', emergency: backendRead('irfan_os_emergency', null) }
+    };
+  }
+  function backendRequest(path, options) {
+    if (window.location.protocol === 'file:') return Promise.reject(new Error('local file mode'));
+    var init = options || {};
+    init.headers = Object.assign({'Content-Type': 'application/json'}, init.headers || {});
+    return fetch('/api' + path, init).then(function (response) {
+      return response.text().then(function (text) {
+        var data = text ? JSON.parse(text) : {};
+        if (!response.ok) throw new Error(data.error || ('HTTP ' + response.status));
+        return data;
+      });
+    });
+  }
+  function backendStatus(label, tone) {
+    var topbar = document.querySelector('.topbar');
+    if (!topbar) return;
+    var el = document.getElementById('irfan-backend-status');
+    if (!el) { el = document.createElement('span'); el.id = 'irfan-backend-status'; el.style.cssText = 'font-size:10px;padding:3px 8px;border-radius:12px;border:1px solid var(--border);white-space:nowrap'; topbar.insertBefore(el, topbar.querySelector('.tr')); }
+    el.textContent = label;
+    el.style.color = tone === 'ok' ? 'var(--g)' : tone === 'warn' ? 'var(--y)' : 'var(--text3)';
+    el.style.background = tone === 'ok' ? 'var(--gd)' : tone === 'warn' ? 'var(--yd)' : 'var(--bg3)';
+  }
+  function backendApply(state) {
+    if (!state || typeof state !== 'object') return;
+    var hasRemote = Boolean(state.updatedAt);
+    if (hasRemote && Array.isArray(state.tasks)) window.TASKS = state.tasks;
+    if (hasRemote && Array.isArray(state.goals) && state.goals.length) window.goals = state.goals;
+    if (hasRemote && Array.isArray(state.habits) && state.habits.length) window.habits = state.habits;
+    if (hasRemote && Array.isArray(state.journalEntries)) backendWrite('irfan_os_journal_entries', state.journalEntries);
+    if (hasRemote && Array.isArray(state.bookmarks)) backendWrite('irfan_os_bookmarks', state.bookmarks);
+    if (hasRemote && Array.isArray(state.opportunities)) backendWrite('irfan_os_opportunities', state.opportunities);
+    if (hasRemote && state.opportunityPipeline) backendWrite('irfan_os_opportunity_pipeline', state.opportunityPipeline);
+    if (hasRemote && Array.isArray(state.warChat)) backendWrite('irfan_os_war_chat', state.warChat);
+    if (hasRemote && state.settings && state.settings.emergency) backendWrite('irfan_os_emergency', state.settings.emergency);
+    if (hasRemote && state.settings && (state.settings.theme === 'dark' || state.settings.theme === 'light')) {
+      try { localStorage.setItem('irfan_os_theme', state.settings.theme); document.documentElement.setAttribute('data-theme', state.settings.theme); } catch (e) {}
+    }
+    if (state.habitLogs) Object.keys(state.habitLogs).forEach(function (key) { try { localStorage.setItem(key, state.habitLogs[key]); } catch (e) {} });
+    try { localStorage.setItem('irfan_os_tasks', JSON.stringify(window.TASKS || [])); } catch (e) {}
+    if (typeof upgradeRenderToday === 'function') upgradeRenderToday();
+    if (typeof renderKanban === 'function') renderKanban();
+    if (typeof upgradeRenderWarRoom === 'function') upgradeRenderWarRoom();
+  }
+  function backendPush(force) {
+    if (!backendAvailable || backendSyncBusy) return Promise.resolve();
+    var snapshot = backendSnapshot();
+    var serialized = JSON.stringify(snapshot);
+    if (!force && serialized === backendLastSnapshot) return Promise.resolve();
+    backendSyncBusy = true;
+    return backendRequest('/state', {method:'PUT', body:JSON.stringify({state:snapshot})}).then(function (state) {
+      backendLastSnapshot = JSON.stringify({tasks:state.tasks,goals:state.goals,habits:state.habits,habitLogs:state.habitLogs,journalEntries:state.journalEntries,bookmarks:state.bookmarks,opportunities:state.opportunities,opportunityPipeline:state.opportunityPipeline,warChat:state.warChat,settings:state.settings});
+      backendStatus('SYNC SERVER', 'ok');
+    }).catch(function (error) { backendStatus('SYNC RETRY', 'warn'); console.warn('[IRFAN OS] sync failed', error); }).finally(function () { backendSyncBusy = false; });
+  }
+  function backendConnect() {
+    backendRequest('/state').then(function (state) {
+      backendAvailable = true;
+      if (state.updatedAt) backendApply(state);
+      else backendPush(true);
+      backendLastSnapshot = JSON.stringify(backendSnapshot());
+      backendStatus('SYNC SERVER', 'ok');
+      backendTimer = setInterval(function () { backendPush(false); }, 5000);
+    }).catch(function () { backendStatus('LOCAL MODE', 'muted'); });
+  }
+
+  function addTaskStyles() {
+    if (document.getElementById('irfan-task-upgrade-style')) return;
+    var style = document.createElement('style'); style.id = 'irfan-task-upgrade-style';
+    style.textContent = '.upgrade-task-tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rad)}.upgrade-task-tools input,.upgrade-task-tools select,.upgrade-task-form input,.upgrade-task-form select,.upgrade-task-form textarea{background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--rsm);padding:7px 9px;font:inherit;font-size:11px}.upgrade-task-tools input{min-width:190px;flex:1}.upgrade-task-tools select{min-width:115px}.upgrade-task-form{display:none;grid-template-columns:2fr 1fr 1fr 1fr;gap:7px;margin-bottom:10px;padding:10px;background:var(--card);border:1px solid var(--c);border-radius:var(--rad)}.upgrade-task-form.open{display:grid}.upgrade-task-form textarea{grid-column:1/-1;min-height:48px;resize:vertical}.upgrade-task-form .wide{grid-column:span 2}.upgrade-task-form-actions{grid-column:1/-1;display:flex;gap:7px;justify-content:flex-end}.upgrade-kcard{position:relative;cursor:grab}.upgrade-kcard.dragging{opacity:.45}.upgrade-kcard.drop-target{outline:1px dashed var(--c)}.upgrade-kcheck{position:absolute;top:10px;right:34px}.upgrade-kcard .upgrade-ktitle{padding-right:42px;cursor:pointer}.upgrade-kpriority{font-family:var(--mono);font-size:9px}.upgrade-kpriority.high{color:var(--r)}.upgrade-kpriority.med{color:var(--y)}.upgrade-kpriority.low{color:var(--g)}.upgrade-kreminder{color:var(--p);font-size:10px}.upgrade-selected-count{font-size:10px;color:var(--text3);margin-left:auto}.upgrade-task-empty{padding:14px;text-align:center;color:var(--text3);font-size:11px}.upgrade-mobile-row{display:flex;gap:7px;flex-wrap:wrap}.upgrade-task-form label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--text3)}@media(max-width:700px){.upgrade-task-form{grid-template-columns:1fr 1fr}.upgrade-task-form .wide{grid-column:1/-1}}';
+    document.head.appendChild(style);
+  }
+  function ensureTaskTools() {
+    var page = document.getElementById('pg-kanban'), board = document.getElementById('kanban');
+    if (!page || !board || document.getElementById('upgrade-task-tools')) return;
+    addTaskStyles();
+    board.insertAdjacentHTML('beforebegin','<div class="upgrade-task-tools" id="upgrade-task-tools"><input id="upgrade-task-search" placeholder="Cari task..." oninput="renderKanban()"><select id="upgrade-task-priority" onchange="renderKanban()"><option value="all">Semua prioritas</option><option value="URGENT">Urgent</option><option value="HIGH">High</option><option value="MED">Medium</option><option value="LOW">Low</option></select><select id="upgrade-task-status" onchange="renderKanban()"><option value="all">Semua status</option><option value="todo">To Do</option><option value="in_progress">In Progress</option><option value="done">Done</option></select><button class="upgrade-action primary" onclick="upgradeNewTask()">+ Task</button><button class="upgrade-action" onclick="upgradeBulkComplete()">Selesaikan terpilih</button><button class="upgrade-action" onclick="upgradeBulkDelete()">Hapus terpilih</button><button class="upgrade-action" onclick="upgradeExportData()">Export</button><span class="upgrade-selected-count" id="upgrade-selected-count">0 dipilih</span></div><form class="upgrade-task-form" id="upgrade-task-form" onsubmit="event.preventDefault();upgradeSaveTask()"><input type="hidden" id="upgrade-task-id"><label class="wide">Judul<input id="upgrade-task-title" required></label><label>Kategori<select id="upgrade-task-category"><option>Personal</option><option>Finansial</option><option>Kuliah</option><option>Karier</option><option>Kesehatan</option><option>Akademik</option></select></label><label>Agent<select id="upgrade-task-agent"><option>OWNER</option><option>ATLAS</option><option>ARIA</option><option>ECHO</option><option>LEDGER</option><option>NOVA</option><option>MIRA</option><option>LUMEN</option><option>SAGE</option></select></label><label>Prioritas<select id="upgrade-task-priority-input"><option>URGENT</option><option>HIGH</option><option selected>MED</option><option>LOW</option></select></label><label>Status<select id="upgrade-task-status-input"><option value="todo">To Do</option><option value="in_progress">In Progress</option><option value="done">Done</option></select></label><label>Deadline<input id="upgrade-task-due" type="datetime-local"></label><label>Reminder<input id="upgrade-task-reminder" type="datetime-local"></label><label>Berulang<select id="upgrade-task-recurrence"><option value="none">Tidak berulang</option><option value="daily">Harian</option><option value="weekly">Mingguan</option><option value="monthly">Bulanan</option></select></label><textarea id="upgrade-task-notes" placeholder="Catatan task..."></textarea><div class="upgrade-task-form-actions"><button type="button" class="upgrade-action" onclick="upgradeCloseTaskForm()">Batal</button><button type="submit" class="upgrade-action primary">Simpan task</button></div></form>');
+  }
+  function inputDate(value) { if (!value) return ''; var d = new Date(value); if (isNaN(d.getTime())) return String(value).slice(0,16); var pad = function (n) { return String(n).padStart(2,'0'); }; return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+  function taskDate(value) { return value ? new Date(value).toISOString() : null; }
+  function priorityClass(value) { return String(value || 'MED').toLowerCase(); }
+  window.upgradeOpenTaskForm = function (id) {
+    ensureTaskTools(); var task = (window.TASKS || []).find(function (item) { return item.id === id; });
+    var form = document.getElementById('upgrade-task-form'); if (!form) return;
+    document.getElementById('upgrade-task-id').value = task ? task.id : '';
+    document.getElementById('upgrade-task-title').value = task ? task.title : '';
+    document.getElementById('upgrade-task-category').value = task ? task.category : 'Personal';
+    document.getElementById('upgrade-task-agent').value = task ? task.agent : 'OWNER';
+    document.getElementById('upgrade-task-priority-input').value = task ? task.priority : 'MED';
+    document.getElementById('upgrade-task-status-input').value = task ? task.status : 'todo';
+    document.getElementById('upgrade-task-due').value = taskDate(task && task.dueDate) ? inputDate(task.dueDate) : '';
+    document.getElementById('upgrade-task-reminder').value = taskDate(task && task.reminderAt) ? inputDate(task.reminderAt) : '';
+    document.getElementById('upgrade-task-recurrence').value = task && task.recurrence ? task.recurrence : 'none';
+    document.getElementById('upgrade-task-notes').value = task && task.notes ? task.notes : '';
+    form.classList.add('open'); document.getElementById('upgrade-task-title').focus();
+  };
+  window.upgradeNewTask = function () { upgradeOpenTaskForm(''); };
+  window.upgradeCloseTaskForm = function () { var form = document.getElementById('upgrade-task-form'); if (form) form.classList.remove('open'); };
+  window.upgradeSaveTask = function () {
+    var id = document.getElementById('upgrade-task-id').value;
+    var task = {id:id || 'task-'+Date.now(),title:document.getElementById('upgrade-task-title').value.trim(),category:document.getElementById('upgrade-task-category').value,agent:document.getElementById('upgrade-task-agent').value,priority:document.getElementById('upgrade-task-priority-input').value,status:document.getElementById('upgrade-task-status-input').value,dueDate:taskDate(document.getElementById('upgrade-task-due').value),reminderAt:taskDate(document.getElementById('upgrade-task-reminder').value),recurrence:document.getElementById('upgrade-task-recurrence').value,notes:document.getElementById('upgrade-task-notes').value.trim(),completedAt:null,createdAt:new Date().toISOString()};
+    if (!task.title) return;
+    if (task.status === 'done') task.completedAt = new Date().toISOString();
+    var index = (window.TASKS || []).findIndex(function (item) { return item.id === id; });
+    if (index >= 0) task.createdAt = TASKS[index].createdAt || task.createdAt, TASKS[index] = Object.assign({}, TASKS[index], task); else TASKS.push(task);
+    if (typeof upgradePersistTasks === 'function') upgradePersistTasks();
+    upgradeCloseTaskForm(); renderKanban(); if (typeof upgradeRenderToday === 'function') upgradeRenderToday();
+    toast('✅', index >= 0 ? 'Task diperbarui' : 'Task dibuat', 'g');
+  };
+  window.upgradeDeleteTask = function (id) { if (!confirm('Hapus task ini?')) return; TASKS = TASKS.filter(function (task) { return task.id !== id; }); if (typeof upgradePersistTasks === 'function') upgradePersistTasks(); renderKanban(); upgradeRenderToday(); toast('🗑️','Task dihapus','x'); };
+  function selectedTaskIds() { return Array.from(document.querySelectorAll('.upgrade-kcheck:checked')).map(function (el) { return el.getAttribute('data-task-id'); }); }
+  window.upgradeBulkComplete = function () { var ids = selectedTaskIds(); if (!ids.length) return toast('ℹ️','Pilih task dulu','c'); TASKS.forEach(function (task) { if (ids.indexOf(task.id) >= 0) { task.status = 'done'; task.completedAt = new Date().toISOString(); } }); if (typeof upgradePersistTasks === 'function') upgradePersistTasks(); renderKanban(); upgradeRenderToday(); toast('✅',ids.length+' task diselesaikan','g'); };
+  window.upgradeBulkDelete = function () { var ids = selectedTaskIds(); if (!ids.length) return toast('ℹ️','Pilih task dulu','c'); if (!confirm('Hapus '+ids.length+' task terpilih?')) return; TASKS = TASKS.filter(function (task) { return ids.indexOf(task.id) < 0; }); if (typeof upgradePersistTasks === 'function') upgradePersistTasks(); renderKanban(); upgradeRenderToday(); toast('🗑️',ids.length+' task dihapus','x'); };
+  window.upgradeExportData = function () { var data = backendSnapshot(); var blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'irfan-os-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},500); };
+  window.upgradeAllowDrop = function (event, el) { event.preventDefault(); if (el) el.classList.add('drop-target'); };
+  window.upgradeLeaveDrop = function (el) { if (el) el.classList.remove('drop-target'); };
+  window.upgradeDragStart = function (event, id) { event.dataTransfer.setData('text/plain',id); event.currentTarget.classList.add('dragging'); };
+  window.upgradeDrop = function (event, status, el) { event.preventDefault(); if (el) el.classList.remove('drop-target'); var id = event.dataTransfer.getData('text/plain'), task = TASKS.find(function (item) { return item.id === id; }); if (!task) return; task.status = status; task.completedAt = status === 'done' ? new Date().toISOString() : null; if (typeof upgradePersistTasks === 'function') upgradePersistTasks(); renderKanban(); upgradeRenderToday(); toast('↔️','Status task dipindahkan','c'); };
+
+  window.renderKanban = function () {
+    ensureTaskTools(); var board = document.getElementById('kanban'); if (!board) return;
+    var category = document.getElementById('kbfil') ? document.getElementById('kbfil').value : 'all';
+    var search = ((document.getElementById('upgrade-task-search') || {}).value || '').toLowerCase().trim();
+    var priority = document.getElementById('upgrade-task-priority') ? document.getElementById('upgrade-task-priority').value : 'all';
+    var statusFilter = document.getElementById('upgrade-task-status') ? document.getElementById('upgrade-task-status').value : 'all';
+    var columns = [{status:'todo',label:'TO DO',col:'var(--text3)'},{status:'in_progress',label:'IN PROGRESS',col:'var(--c)'},{status:'done',label:'DONE',col:'var(--g)'}];
+    var visible = (window.TASKS || []).filter(function (task) { var hay = (task.title+' '+task.category+' '+task.agent+' '+(task.notes||'')).toLowerCase(); return (category === 'all' || task.category === category) && (!search || hay.indexOf(search) >= 0) && (priority === 'all' || task.priority === priority) && (statusFilter === 'all' || task.status === statusFilter); });
+    var open = TASKS.filter(function (task) { return task.status !== 'done'; }).length, late = TASKS.filter(typeof upgradeIsOverdue === 'function' ? upgradeIsOverdue : function(){return false;}).length, badges = document.querySelectorAll('#pg-kanban > div:first-child .badge');
+    if (badges[0]) badges[0].textContent = open + ' terbuka'; if (badges[1]) badges[1].textContent = late + ' overdue';
+    board.classList.add('upgrade-kanban');
+    board.innerHTML = columns.map(function (column) { var cards = visible.filter(function (task) { return task.status === column.status; }); return '<section class="upgrade-kcol" ondragover="upgradeAllowDrop(event,this)" ondragleave="upgradeLeaveDrop(this)" ondrop="upgradeDrop(event,\''+column.status+'\',this)"><div class="upgrade-khead" style="--col:'+column.col+'"><span>'+column.label+'</span><span>'+cards.length+'</span></div><div class="upgrade-kcards">'+(cards.length ? cards.map(function (task) { var id = upgradeEsc(task.id), lateTask = typeof upgradeIsOverdue === 'function' && upgradeIsOverdue(task), reminder = task.reminderAt && new Date(task.reminderAt) > new Date() ? ' · reminder '+inputDate(task.reminderAt).replace('T',' ') : ''; return '<article class="upgrade-kcard" draggable="true" ondragstart="upgradeDragStart(event,\''+id+'\')" ondragend="this.classList.remove(\'dragging\')"><input class="upgrade-kcheck" type="checkbox" data-task-id="'+id+'" onchange="upgradeUpdateSelectedCount()"><button class="upgrade-move" title="Pindah ke kolom berikutnya" onclick="upgradeAdvanceTask(\''+id+'\')">→</button><div class="upgrade-ktitle" onclick="upgradeOpenTaskForm(\''+id+'\')">'+upgradeEsc(task.title)+'</div><div class="upgrade-kmeta"><span class="upgrade-kagent">'+upgradeEsc(task.agent)+'</span><span class="badge bx" style="font-size:9px">'+upgradeEsc(task.category)+'</span><span class="upgrade-kpriority '+priorityClass(task.priority)+'">'+upgradeEsc(task.priority || 'MED')+'</span><span class="upgrade-kdue '+(lateTask ? 'late' : '')+'">'+upgradeEsc(typeof upgradeDueLabel === 'function' ? upgradeDueLabel(task) : '')+'</span>'+(reminder ? '<span class="upgrade-kreminder">'+upgradeEsc(reminder)+'</span>' : '')+'</div><div style="display:flex;gap:5px;margin-top:7px"><button class="upgrade-action" onclick="upgradeOpenTaskForm(\''+id+'\')">Edit</button><button class="upgrade-action" onclick="upgradeDeleteTask(\''+id+'\')">Hapus</button></div></article>'; }).join('') : '<div class="upgrade-task-empty">Tidak ada task</div>')+'</div></section>'; }).join('');
+    upgradeUpdateSelectedCount();
+  };
+  window.upgradeUpdateSelectedCount = function () { var el = document.getElementById('upgrade-selected-count'); if (el) el.textContent = document.querySelectorAll('.upgrade-kcheck:checked').length + ' dipilih'; };
+
+  function nextRecurringDate(value, recurrence) { var date = value ? new Date(value) : new Date(); if (recurrence === 'daily') date.setDate(date.getDate()+1); else if (recurrence === 'weekly') date.setDate(date.getDate()+7); else if (recurrence === 'monthly') date.setMonth(date.getMonth()+1); return date.toISOString(); }
+  var originalSetTaskStatus = window.upgradeSetTaskStatus;
+  window.upgradeSetTaskStatus = function (id, status) {
+    var task = TASKS.find(function (item) { return item.id === id; }); if (!task) return;
+    task.status = status; task.completedAt = status === 'done' ? new Date().toISOString() : null;
+    if (status === 'done' && task.recurrence && task.recurrence !== 'none' && !task.nextOccurrenceId) { var next = Object.assign({}, task, {id:'task-'+Date.now(),status:'todo',completedAt:null,dueDate:nextRecurringDate(task.dueDate,task.recurrence),nextOccurrenceId:null}); task.nextOccurrenceId = next.id; TASKS.push(next); }
+    if (typeof upgradePersistTasks === 'function') upgradePersistTasks(); renderKanban(); upgradeRenderToday(); if (typeof upgradeRenderWarRoom === 'function') upgradeRenderWarRoom(); toast(status === 'done' ? '✅' : '▶️', status === 'done' ? 'Task selesai' : 'Task dimulai', status === 'done' ? 'g' : 'c');
+  };
+  var originalPersistTasks = window.upgradePersistTasks;
+  window.upgradePersistTasks = function () { if (typeof originalPersistTasks === 'function') originalPersistTasks.apply(this, arguments); backendPush(false); };
+
+  var originalSendW = window.sendW;
+  window.sendW = function (prefill) {
+    var input = document.getElementById('winput'), promptText = String(prefill || (input && input.value) || '').trim(); if (!promptText) return;
+    var current = backendRead('irfan_os_war_chat', []); if (!Array.isArray(current)) current = []; current.push({from:'OWNER',text:promptText,time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}); backendWrite('irfan_os_war_chat', current.slice(-40)); if (input) input.value = ''; if (typeof upgradeRenderWarChat === 'function') upgradeRenderWarChat();
+    if (!backendAvailable) return typeof originalSendW === 'function' ? originalSendW(promptText) : undefined;
+    backendRequest('/ai/warroom',{method:'POST',body:JSON.stringify({prompt:promptText,context:{tasks:TASKS,goals:goals}})}).then(function (result) { var messages = backendRead('irfan_os_war_chat', []); messages.push({from:'ATLAS',text:result.text,time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}); backendWrite('irfan_os_war_chat',messages.slice(-40)); if (typeof upgradeRenderWarChat === 'function') upgradeRenderWarChat(); toast('🤖',result.provider === 'local-fallback' ? 'Mode lokal aktif' : 'ATLAS AI membalas','g'); }).catch(function () { toast('⚠️','AI tidak tersedia, coba lagi','x'); });
+  };
+
+  var originalNav = window.nav;
+  window.nav = function (id, btn) { if (typeof originalNav === 'function') originalNav(id, btn); if (id === 'kanban') { ensureTaskTools(); renderKanban(); } };
+  window.addEventListener('beforeunload', function () { if (backendAvailable) backendPush(true); });
+  window.setInterval(function () { var tasks = window.TASKS || []; tasks.forEach(function (task) { if (task.reminderAt && task.status !== 'done' && new Date(task.reminderAt) <= new Date() && !backendRead('irfan_os_notified_'+task.id,false)) { try { localStorage.setItem('irfan_os_notified_'+task.id,'1'); } catch (e) {} toast('⏰','Reminder: '+task.title,'y'); } }); }, 60000);
+  window.IRFAN_BACKEND = {connect:backendConnect,push:backendPush,snapshot:backendSnapshot};
+  backendConnect();
+  if (document.getElementById('pg-kanban') && document.getElementById('pg-kanban').classList.contains('on')) { ensureTaskTools(); renderKanban(); }
+})();
+</script>
 </body>
 </html>

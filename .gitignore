@@ -2,3 +2,8 @@
 *.tmp
 Thumbs.db
 .DS_Store
+
+# Runtime data is stored on the VPS and must never be committed.
+server/data/*.json
+server/data/backups/
+server/data/.keep

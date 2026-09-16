@@ -1,5 +1,5 @@
 [Unit]
-Description=IRFAN OS static dashboard
+Description=IRFAN OS dashboard API and web app
 After=network-online.target
 Wants=network-online.target
 
@@ -7,12 +7,16 @@ Wants=network-online.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/irfan-os-dashboard
-ExecStart=/usr/bin/python3 -m http.server 18086 --bind 0.0.0.0 --directory /home/ubuntu/irfan-os-dashboard
+ExecStart=/usr/bin/node /home/ubuntu/irfan-os-dashboard/server/server.js
 Restart=always
 RestartSec=5
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/irfan-os-dashboard/server/data
+Environment=NODE_ENV=production
+Environment=PORT=18086
+EnvironmentFile=-/etc/irfan-os-dashboard.env
 
 [Install]
 WantedBy=multi-user.target

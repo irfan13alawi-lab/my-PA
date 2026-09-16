@@ -568,5 +568,61 @@ window.addEventListener('message', function(event){
 // ══════════════════════════════════════════
 render();
 </script>
+<script>
+// OPPORTUNITY PIPELINE + SERVER SYNC
+(function () {
+  'use strict';
+  var pipeline = {};
+  var opportunityBackend = false;
+  var opportunitySyncTimer = null;
+  try { pipeline = JSON.parse(localStorage.getItem('irfan_os_opportunity_pipeline') || '{}') || {}; } catch (e) { pipeline = {}; }
+
+  function pipelineMeta(id) { if (!pipeline[id]) pipeline[id] = {status:'saved',notes:'',reminderAt:null}; return pipeline[id]; }
+  function escapeAttr(value) { return String(value || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+  function oppRequest(path, options) {
+    if (window.location.protocol === 'file:') return Promise.reject(new Error('local file mode'));
+    var init = options || {}; init.headers = Object.assign({'Content-Type':'application/json'},init.headers || {});
+    return fetch('/api'+path,init).then(function (response) { return response.text().then(function (text) { var data = text ? JSON.parse(text) : {}; if (!response.ok) throw new Error(data.error || ('HTTP '+response.status)); return data; }); });
+  }
+  function opportunitySaveLocal() {
+    try { localStorage.setItem('irfan_os_opportunity_pipeline',JSON.stringify(pipeline)); localStorage.setItem('irfan_os_opportunities',JSON.stringify(DATA)); } catch (e) {}
+  }
+  function opportunityPush() {
+    if (!opportunityBackend) return Promise.resolve();
+    opportunitySaveLocal();
+    return oppRequest('/opportunities',{method:'PUT',body:JSON.stringify({opportunities:DATA,opportunityPipeline:pipeline,bookmarks:Array.from(bookmarks)})}).catch(function (error) { console.warn('[IRFAN OS] opportunity sync failed',error); });
+  }
+  function ensurePipelineTools() {
+    if (document.getElementById('opportunity-pipeline-tools')) return;
+    var chips = document.getElementById('chips'); if (!chips) return;
+    var style = document.createElement('style'); style.textContent = '.opp-pipeline-tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}.opp-pipeline-tools select,.opp-pipeline-tools button,.opp-pipeline-tools label{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:var(--rsm);padding:6px 9px;font:inherit;font-size:10px;cursor:pointer}.opp-pipeline-tools .primary{color:var(--cyan);border-color:rgba(0,212,255,.35)}.opp-pipeline-summary{font-size:10px;color:var(--text3);margin-left:auto}.opp-pipeline{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:7px}.opp-pipeline select{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:4px;padding:4px 5px;font-size:9px;max-width:110px}.opp-pipeline button{background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:3px 5px;font-size:9px;cursor:pointer}.opp-pipeline button:hover{color:var(--text);border-color:var(--c)}.opp-reminder{font-size:9px;color:var(--purple)}'; document.head.appendChild(style);
+    chips.insertAdjacentHTML('afterend','<div class="opp-pipeline-tools" id="opportunity-pipeline-tools"><select id="opp-status-filter" onchange="render()"><option value="all">Semua status</option><option value="saved">Saved</option><option value="applied">Applied</option><option value="interview">Interview</option><option value="rejected">Rejected</option><option value="accepted">Accepted</option></select><button class="primary" onclick="addOpportunity()">+ Tambah peluang</button><button onclick="exportOpportunities()">Export JSON</button><label>Import JSON<input type="file" accept="application/json" onchange="importOpportunities(this)" style="display:none"></label><span class="opp-pipeline-summary" id="opp-pipeline-summary"></span></div>');
+  }
+  function statusOptions(selected) { return [['saved','Saved'],['applied','Applied'],['interview','Interview'],['rejected','Rejected'],['accepted','Accepted']].map(function (item) { return '<option value="'+item[0]+'"'+(selected === item[0] ? ' selected' : '')+'>'+item[1]+'</option>'; }).join(''); }
+  function decorateCards() {
+    ensurePipelineTools(); var filter = (document.getElementById('opp-status-filter') || {}).value || 'all', visible = 0;
+    document.querySelectorAll('.opp-card').forEach(function (card) {
+      var id = card.id.replace(/^card-/,''); var meta = pipelineMeta(id); var shown = filter === 'all' || meta.status === filter; card.style.display = shown ? '' : 'none'; if (shown) visible++;
+      var right = card.querySelector('.opp-right'); if (!right || right.querySelector('.opp-pipeline')) return;
+      var safe = escapeAttr(id), reminder = meta.reminderAt ? '<span class="opp-reminder">⏰ '+String(meta.reminderAt).slice(0,16).replace('T',' ')+'</span>' : '';
+      right.insertAdjacentHTML('beforeend','<div class="opp-pipeline"><select onchange="setOppStatus(\''+safe+'\',this.value)">'+statusOptions(meta.status)+'</select><button onclick="setOppNote(\''+safe+'\')" title="Catatan">Note</button><button onclick="setOppReminder(\''+safe+'\')" title="Reminder">⏰</button>'+reminder+'</div>');
+    });
+    var counts = {}; DATA.forEach(function (item) { var status = pipelineMeta(item.id).status; counts[status] = (counts[status] || 0)+1; });
+    var summary = document.getElementById('opp-pipeline-summary'); if (summary) summary.textContent = 'Saved '+(counts.saved||0)+' · Applied '+(counts.applied||0)+' · Interview '+(counts.interview||0)+' · Accepted '+(counts.accepted||0)+' · '+visible+' tampil';
+  }
+  var originalOpportunityRender = window.render;
+  window.render = function () { if (typeof originalOpportunityRender === 'function') originalOpportunityRender(); decorateCards(); };
+  window.setOppStatus = function (id,status) { pipelineMeta(id).status = status; opportunitySaveLocal(); opportunityPush(); decorateCards(); toast('📌','Status peluang diperbarui','green'); };
+  window.setOppNote = function (id) { var meta = pipelineMeta(id), note = prompt('Catatan peluang:',meta.notes || ''); if (note === null) return; meta.notes = note; opportunitySaveLocal(); opportunityPush(); toast('📝','Catatan tersimpan','cyan'); };
+  window.setOppReminder = function (id) { var meta = pipelineMeta(id), value = prompt('Reminder (YYYY-MM-DDTHH:MM), kosongkan untuk hapus:',meta.reminderAt || ''); if (value === null) return; meta.reminderAt = value.trim() || null; opportunitySaveLocal(); opportunityPush(); render(); };
+  window.addOpportunity = function () { var title = prompt('Judul peluang baru:'); if (!title || !title.trim()) return; var source = prompt('Sumber/perusahaan:',''); var date = prompt('Deadline (YYYY-MM-DD):',''); var id = 'custom-'+Date.now(); DATA.push({id:id,type:'job',icon:'⭐',bg:'var(--cyan-dim)',col:'var(--cyan)',title:title.trim(),source:source || 'Custom',date:date || '',url:'',desc:'Peluang custom yang ditambahkan dari pipeline IRFAN OS.',tags:[['Custom','c']],match:0}); pipeline[id] = {status:'saved',notes:'',reminderAt:null}; opportunitySaveLocal(); opportunityPush(); render(); toast('✨','Peluang ditambahkan','green'); };
+  window.exportOpportunities = function () { var payload = {exportedAt:new Date().toISOString(),opportunities:DATA,pipeline:pipeline,bookmarks:Array.from(bookmarks)}; var blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'irfan-os-opportunities-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},500); };
+  window.importOpportunities = function (input) { var file = input && input.files && input.files[0]; if (!file) return; var reader = new FileReader(); reader.onload = function () { try { var payload = JSON.parse(reader.result), incoming = Array.isArray(payload) ? payload : payload.opportunities; if (!Array.isArray(incoming)) throw new Error('format'); DATA.splice(0,DATA.length,...incoming); if (payload.pipeline && typeof payload.pipeline === 'object') pipeline = payload.pipeline; opportunitySaveLocal(); opportunityPush(); render(); toast('📥','Peluang berhasil diimpor','green'); } catch (e) { toast('⚠️','Format JSON tidak valid','yellow'); } input.value = ''; }; reader.readAsText(file); };
+  function connectOpportunities() {
+    oppRequest('/state').then(function (state) { opportunityBackend = true; if (Array.isArray(state.opportunities) && state.opportunities.length) DATA.splice(0,DATA.length,...state.opportunities); if (state.opportunityPipeline && typeof state.opportunityPipeline === 'object') pipeline = state.opportunityPipeline; if (Array.isArray(state.bookmarks) && state.bookmarks.length) bookmarks = new Set(state.bookmarks); opportunitySaveLocal(); if (!state.opportunities || !state.opportunities.length) opportunityPush(); render(); opportunitySyncTimer = setInterval(function(){ opportunityPush(); },15000); }).catch(function () { render(); });
+  }
+  connectOpportunities();
+})();
+</script>
 </body>
 </html>
