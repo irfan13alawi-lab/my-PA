@@ -1078,7 +1078,7 @@ function legacyRenderHGrid() {
   }).join('');
 }
 
-function toggleH(el) {
+function legacyToggleH(el) {
   var hi = parseInt(el.dataset.hi);
   var d  = parseInt(el.dataset.d);
   if (d >= 5) return;
@@ -1088,7 +1088,7 @@ function toggleH(el) {
   toast(habits[hi].e, habits[hi].name + (habits[hi].days[d] ? ' selesai!' : ' dibatalkan'), habits[hi].days[d] ? 'g' : 'x');
 }
 
-function updateHKpi() {
+function legacyUpdateHKpi() {
   var done = habits.filter(function(h){ return h.days[4]; }).length;
   var kpi = document.getElementById('hkpi');
   if (kpi) kpi.innerHTML = done + '<span style="font-size:13px;color:var(--text3)">/9</span>';
@@ -1238,22 +1238,24 @@ function renderSkillGap() {
 // ══ CHARTS ══
 function renderGoalChart() {
   var el = document.getElementById('ch-goals');
-  if (!el || typeof Highcharts === 'undefined') return;
+  if (!el) return;
+  if (typeof Highcharts === 'undefined') { if (typeof upgradeRenderChartFallback === 'function') upgradeRenderChartFallback('ch-goals',{data:{labels:goals.map(function(g){return g.name;}),datasets:[{data:goals.map(function(g){return g.pct;})}]}}); return; }
   Highcharts.chart(el, {
     chart:{polar:true,type:'area',backgroundColor:'transparent',margin:[10,10,10,10]},
     title:{text:null},pane:{size:'80%'},
-    xAxis:{categories:['Akademik','Finansial','Personal','Karier','Kesehatan','Karakter','Relasi','Travel'],tickmarkPlacement:'on',lineWidth:0,labels:{style:{color:'#9aa3b8',fontSize:'10px'}}},
+    xAxis:{categories:goals.map(function(g){return g.name.replace(/^\S+\s/,'');}),tickmarkPlacement:'on',lineWidth:0,labels:{style:{color:'#9aa3b8',fontSize:'10px'}}},
     yAxis:{gridLineInterpolation:'polygon',min:0,max:100,lineWidth:0,labels:{style:{color:'#5c6680',fontSize:'9px'}}},
     tooltip:{shared:true,valueSuffix:'%',backgroundColor:'#161b26',borderColor:'#232b3e',style:{color:'#e8ecf4'}},
     legend:{enabled:false},
-    series:[{name:'Progress',data:[33,25,50,0,0,0,50,0],color:'#00d4ff',fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,'rgba(0,212,255,.28)'],[1,'rgba(0,212,255,.02)']]},lineWidth:2,marker:{symbol:'circle',radius:3}}],
+    series:[{name:'Progress',data:goals.map(function(g){return g.pct;}),color:'#00d4ff',fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,'rgba(0,212,255,.28)'],[1,'rgba(0,212,255,.02)']]},lineWidth:2,marker:{symbol:'circle',radius:3}}],
     credits:{enabled:false},accessibility:{enabled:false}
   });
 }
 
 function renderSkillRadar() {
   var el = document.getElementById('ch-skill');
-  if (!el || typeof Highcharts === 'undefined') return;
+  if (!el) return;
+  if (typeof Highcharts === 'undefined') { if (typeof upgradeRenderChartFallback === 'function') upgradeRenderChartFallback('ch-skill',{data:{labels:['Seismic','Petrel','Python','Well Log','AVO','Reservoir','English','Network'],datasets:[{data:[60,18,55,45,30,25,70,30]}]}}); return; }
   if (!el.offsetParent && el.offsetWidth === 0) return;
   Highcharts.chart(el, {
     chart:{polar:true,type:'area',backgroundColor:'transparent',margin:[10,10,10,10]},

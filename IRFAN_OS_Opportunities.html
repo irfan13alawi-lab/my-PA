@@ -544,7 +544,7 @@ function toast(icon, msg, type) {
 // ══════════════════════════════════════════
 //  THEME
 // ══════════════════════════════════════════
-let isDark = true;
+let isDark = document.documentElement.getAttribute('data-theme') !== 'light';
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
