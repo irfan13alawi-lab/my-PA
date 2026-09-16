@@ -9,6 +9,12 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+try {
+  var savedTheme = localStorage.getItem('irfan_os_theme');
+  if (savedTheme === 'dark' || savedTheme === 'light') document.documentElement.setAttribute('data-theme', savedTheme);
+} catch (e) {}
+</script>
 <style>
 [data-theme=dark]{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#1f2436;--card:#161b26;--border:#232b3e;--border2:#2a3348;--text:#e8ecf4;--text2:#9aa3b8;--text3:#5c6680;--shadow:rgba(0,0,0,.5);--topbg:rgba(13,15,20,.96)}
 [data-theme=light]{--bg:#f0f2f7;--bg2:#fff;--bg3:#f5f7fb;--bg4:#eaedf5;--card:#fff;--border:#dde1ed;--border2:#c8cedf;--text:#1a1f2e;--text2:#4a5368;--text3:#8a93aa;--shadow:rgba(0,0,0,.1);--topbg:rgba(240,242,247,.96)}
@@ -38,7 +44,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
 /* LAYOUT */
 .layout{display:grid;grid-template-columns:210px 1fr;height:calc(100vh - 52px)}
-@media(max-width:700px){.layout{grid-template-columns:1fr}.sidebar{display:none}.nav{display:none}}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.sidebar{display:none}.topbar{height:auto;min-height:52px;flex-wrap:wrap;padding:8px 12px}.nav{display:flex;order:5;width:100%;padding-top:5px}.ntab{font-size:10px;padding:5px 7px}.main{padding:12px}.opps-frame{height:calc(100vh - 130px);min-height:560px}}
 
 /* SIDEBAR */
 .sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
@@ -135,6 +141,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .upgrade-review label{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);cursor:pointer}
 .upgrade-review input{margin-top:2px;accent-color:var(--g)}
 .upgrade-quick-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.upgrade-chart-fallback{padding:12px;color:var(--text3);font-size:11px}.upgrade-chart-fallback strong{color:var(--text2);display:block;margin-bottom:8px}.upgrade-fallback-row{display:grid;grid-template-columns:minmax(90px,1fr) 2fr 36px;gap:7px;align-items:center;margin:5px 0}.upgrade-fallback-track{height:7px;border-radius:10px;background:var(--bg4);overflow:hidden}.upgrade-fallback-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--c),var(--g))}.upgrade-inline{font-size:10px;padding:3px 7px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);color:var(--text2);cursor:pointer}
 .page{display:none;flex-direction:column;gap:14px;animation:fu .2s ease}
 .page.on{display:flex}
 @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -395,7 +402,7 @@ select:focus{outline:none;border-color:var(--c)}
 <!-- TODAY -->
 <div class="page on" id="pg-today">
   <div class="krow">
-    <div class="kcard" style="--ac:var(--c)"><div class="klbl">Task Terbuka</div><div class="kval">118</div><div class="ksub dn"><i class="fa-solid fa-triangle-exclamation fa-xs"></i> 33 overdue</div><i class="fa-solid fa-list-check kico"></i></div>
+    <div class="kcard" style="--ac:var(--c)"><div class="klbl">Task Terbuka</div><div class="kval" id="today-open-count">0</div><div class="ksub dn"><i class="fa-solid fa-triangle-exclamation fa-xs"></i> <span id="today-overdue-count">0</span> overdue</div><i class="fa-solid fa-list-check kico"></i></div>
     <div class="kcard" style="--ac:var(--g)"><div class="klbl">Habit Hari Ini</div><div class="kval" id="hkpi">0<span style="font-size:13px;color:var(--text3)">/9</span></div><div class="ksub"><i class="fa-solid fa-fire fa-xs"></i> streak: 0</div><i class="fa-solid fa-dumbbell kico"></i></div>
     <div class="kcard" style="--ac:var(--y)"><div class="klbl">GPA Target</div><div class="kval">4.00</div><div class="ksub up"><i class="fa-solid fa-arrow-trend-up fa-xs"></i> 33% progress</div><i class="fa-solid fa-graduation-cap kico"></i></div>
     <div class="kcard" style="--ac:var(--p)"><div class="klbl">AI Agents</div><div class="kval">9</div><div class="ksub up"><i class="fa-solid fa-circle fa-xs" style="color:var(--g)"></i> 8 working</div><i class="fa-solid fa-robot kico"></i></div>
@@ -437,11 +444,11 @@ select:focus{outline:none;border-color:var(--c)}
       </div>
       <!-- DANA DARURAT -->
       <div class="card">
-        <div class="ch"><div class="ct"><i class="fa-solid fa-piggy-bank"></i> DANA DARURAT</div><span style="font-size:11px;color:var(--text3)">Target Rp 15 jt</span></div>
+        <div class="ch"><div class="ct"><i class="fa-solid fa-piggy-bank"></i> DANA DARURAT</div><span style="font-size:11px;color:var(--text3)"><span id="emergency-target-label">Target Rp 15 jt</span> <button class="upgrade-inline" onclick="upgradeEditEmergency()">Update</button></span></div>
         <div class="cb" style="padding:12px 14px">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--g)">Rp 3,7 jt</span><span style="font-size:11px;color:var(--text3)">25%</span></div>
-          <div class="pbar" style="height:6px;margin-bottom:7px"><div class="pfill" style="width:25%;background:linear-gradient(90deg,#00b87d,var(--g))"></div></div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)"><span style="color:var(--g)">+Rp 450k bulan ini</span><span>Sisa Rp 11,3 jt</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span id="emergency-current" style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--g)">Rp 3,7 jt</span><span id="emergency-percent" style="font-size:11px;color:var(--text3)">25%</span></div>
+          <div class="pbar" style="height:6px;margin-bottom:7px"><div class="pfill" id="emergency-progress" style="width:25%;background:linear-gradient(90deg,#00b87d,var(--g))"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)"><span id="emergency-monthly" style="color:var(--g)">+Rp 450k bulan ini</span><span id="emergency-remaining">Sisa Rp 11,3 jt</span></div>
         </div>
       </div>
       <!-- HABIT QUICK -->
@@ -466,9 +473,9 @@ select:focus{outline:none;border-color:var(--c)}
       <div class="ch"><div class="ct"><i class="fa-solid fa-bullseye"></i> 8 GOAL AKTIF 2026</div><span style="font-size:11px;color:var(--text3)">16 milestone · 3 project</span></div>
       <div class="cb">
         <div style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--c)">118</div><div style="font-size:10px;color:var(--text3)">Terbuka</div></div>
-          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--g)">93</div><div style="font-size:10px;color:var(--text3)">Selesai</div></div>
-          <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--r)">33</div><div style="font-size:10px;color:var(--text3)">Overdue</div></div>
+          <div style="text-align:center;flex:1"><div id="goal-open-count" style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--c)">0</div><div style="font-size:10px;color:var(--text3)">Terbuka</div></div>
+          <div style="text-align:center;flex:1"><div id="goal-done-count" style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--g)">0</div><div style="font-size:10px;color:var(--text3)">Selesai</div></div>
+          <div style="text-align:center;flex:1"><div id="goal-overdue-count" style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--r)">0</div><div style="font-size:10px;color:var(--text3)">Overdue</div></div>
           <div style="text-align:center;flex:1"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text3)">0</div><div style="font-size:10px;color:var(--text3)">Evidence</div></div>
         </div>
         <div class="glist" id="glist"></div>
@@ -507,7 +514,7 @@ select:focus{outline:none;border-color:var(--c)}
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span style="font-size:13px;font-weight:600">Task Board</span>
-      <span class="badge bc">118 terbuka</span><span class="badge br">33 overdue</span>
+      <span class="badge bc" id="kb-open-count">0 terbuka</span><span class="badge br" id="kb-overdue-count">0 overdue</span>
     </div>
     <select id="kbfil" onchange="renderKanban()"><option value="all">Semua kategori</option><option value="Finansial">Finansial</option><option value="Kuliah">Kuliah</option><option value="Karier">Karier</option><option value="Kesehatan">Kesehatan</option><option value="Akademik">Akademik</option></select>
   </div>
@@ -636,7 +643,7 @@ select:focus{outline:none;border-color:var(--c)}
       <div class="cb">
         <div class="jform">
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <div style="flex:1"><div class="jlbl">Tipe</div><select style="width:100%"><option>Harian</option><option>Mingguan</option><option>Bulanan</option></select></div>
+            <div style="flex:1"><div class="jlbl">Tipe</div><select id="journal-type" style="width:100%"><option>Harian</option><option>Mingguan</option><option>Bulanan</option></select></div>
             <div style="flex:2"><div class="jlbl">Mood</div><div class="mood-row"><button class="mbtn" onclick="mood(this)">&#128516; Great</button><button class="mbtn" onclick="mood(this)">&#128578; Good</button><button class="mbtn" onclick="mood(this)">&#128528; Okay</button><button class="mbtn" onclick="mood(this)">&#128532; Meh</button></div></div>
           </div>
           <div class="jfield"><div class="jlbl">&#127775; Highlight hari ini</div><textarea placeholder="Apa yang paling bermakna hari ini?"></textarea></div>
@@ -653,11 +660,13 @@ select:focus{outline:none;border-color:var(--c)}
       </div>
     </div>
     <div class="card">
-      <div class="ch"><div class="ct"><i class="fa-regular fa-bookmark"></i> RIWAYAT</div><span class="ca">1 entri</span></div>
-      <div class="cb">
+        <div class="ch"><div class="ct"><i class="fa-regular fa-bookmark"></i> RIWAYAT</div><span class="ca" id="journal-entry-count">1 entri</span></div>
+        <div class="cb">
+        <div id="journal-history">
         <div style="padding:10px 12px;background:var(--bg3);border-radius:var(--rsm);border:1px solid var(--border);margin-bottom:12px;cursor:pointer">
           <div style="font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:3px">Kam 10 Sep 2026 · Harian · &#128516;</div>
-          <div style="font-size:11px;color:var(--text2)">hai &#8212; entri pertama tersimpan di PostgreSQL. Sistem berjalan normal.</div>
+          <div style="font-size:11px;color:var(--text2)">Entri contoh. Refleksi baru disimpan di browser ini.</div>
+        </div>
         </div>
         <div class="slbl">Panduan Harian</div>
         <div class="tasklist">
@@ -678,7 +687,7 @@ select:focus{outline:none;border-color:var(--c)}
     <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-chart-area"></i> TASK COMPLETION</div></div><div class="cb" style="padding:6px"><div id="ch-tasks" style="height:200px"></div></div></div>
     <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-fire"></i> HABIT CHECK-IN</div></div><div class="cb" style="padding:6px"><div id="ch-habits" style="height:200px"></div></div></div>
     <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-chart-pie"></i> DISTRIBUSI TASK</div></div><div class="cb" style="padding:6px"><div id="ch-cats" style="height:200px"></div></div></div>
-    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-bars-progress"></i> GOAL PROGRESS</div></div><div class="cb" style="padding:6px"><div id="ch-goals2" style="height:200px"></div></div></div>
+    <div class="card"><div class="ch"><div class="ct"><i class="fa-solid fa-bars-progress"></i> GOAL PROGRESS RADAR</div></div><div class="cb" style="padding:6px"><div id="ch-goals2" style="height:200px"></div></div></div>
   </div>
 </div>
 
@@ -686,7 +695,7 @@ select:focus{outline:none;border-color:var(--c)}
 <div class="page" id="pg-warroom">
   <div class="g21">
     <div class="card">
-      <div class="ch"><div class="ct"><i class="fa-solid fa-shield-halved"></i> PERSONAL ASSISTANT CONTROL ROOM</div><span class="badge bg">3 pesan</span></div>
+      <div class="ch"><div class="ct"><i class="fa-solid fa-shield-halved"></i> PERSONAL ASSISTANT CONTROL ROOM</div><span class="badge bg" id="war-message-count">2 pesan</span></div>
       <div class="cb">
         <div class="warchat" id="wchat">
           <div class="wmsg own"><div class="wfrom">OWNER</div><div class="wtxt">cari beasiswa perusahaan</div></div>
@@ -697,8 +706,8 @@ select:focus{outline:none;border-color:var(--c)}
           <button class="btn btnc" onclick="sendW()"><i class="fa-solid fa-paper-plane fa-xs"></i> Kirim</button>
         </div>
         <div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">
-          <button class="btn btnc bsm" onclick="toast('&#9989;','Task dibuat dari War Room','g')"><i class="fa-solid fa-circle-check fa-xs"></i> Approve &amp; create task</button>
-          <button class="btn btng bsm"><i class="fa-solid fa-rotate fa-xs"></i> Minta analisis ulang</button>
+          <button class="btn btnc bsm" onclick="upgradeCreateTaskFromWarRoom()"><i class="fa-solid fa-circle-check fa-xs"></i> Approve &amp; create task</button>
+          <button class="btn btng bsm" onclick="sendW('Minta analisis ulang')"><i class="fa-solid fa-rotate fa-xs"></i> Minta analisis ulang</button>
         </div>
       </div>
     </div>
@@ -985,7 +994,7 @@ var deadlines = [
 // ══ NAVIGATION ══
 var charts = {};
 var PAGES = ['today','goals','kanban','agents','career','opps','journal','analytics','warroom'];
-function nav(id, btn) {
+function legacyNav(id, btn) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
   document.querySelectorAll('.ntab').forEach(function(t){ t.classList.remove('on'); });
   document.querySelectorAll('.si').forEach(function(s){ s.classList.remove('on'); });
@@ -1049,7 +1058,7 @@ renderCD();
 setInterval(renderCD, 60000);
 
 // ══ HABITS ══
-function renderHGrid() {
+function legacyRenderHGrid() {
   var el = document.getElementById('hgrid');
   if (!el) return;
   var days_lbl = ['S','S','R','K','J','S','M'];
@@ -1088,7 +1097,7 @@ function updateHKpi() {
   renderHBadges(done);
 }
 
-function renderHBadges() {
+function legacyRenderHBadges() {
   var el = document.getElementById('hbadges');
   if (!el) return;
   el.innerHTML = habits.map(function(h) {
@@ -1096,7 +1105,7 @@ function renderHBadges() {
     return '<span class="badge ' + (d ? 'bg' : 'bx') + '" style="cursor:pointer">' + h.e + ' ' + h.name.split(' ')[0] + (d ? ' ✓' : '') + '</span>';
   }).join('');
 }
-renderHBadges();
+legacyRenderHBadges();
 
 // ══ GOAL LIST ══
 function renderGList() {
@@ -1115,7 +1124,7 @@ function renderGList() {
 renderGList();
 
 // ══ KANBAN ══
-function renderKanban() {
+function legacyRenderKanban() {
   var bd = document.getElementById('kanban');
   if (!bd) return;
   var fil = document.getElementById('kbfil') ? document.getElementById('kbfil').value : 'all';
@@ -1138,7 +1147,6 @@ function renderKanban() {
     '</div>';
   }).join('');
 }
-renderKanban();
 
 // ══ AGENTS ══
 function renderAgents() {
@@ -1262,7 +1270,7 @@ function renderSkillRadar() {
   });
 }
 
-function renderAnalytics() {
+function legacyRenderAnalytics() {
   var dark = document.documentElement.getAttribute('data-theme') !== 'light';
   var tt = {backgroundColor:dark?'#161b26':'#fff',borderColor:dark?'#232b3e':'#dde1ed',style:{color:dark?'#e8ecf4':'#1a1f2e',fontSize:'11px'}};
   var days = ['Sen 7','Sel 8','Rab 9','Kam 10','Jum 11'];
@@ -1275,6 +1283,7 @@ function renderAnalytics() {
 // ══ JOURNAL ══
 function mood(btn) { document.querySelectorAll('.mbtn').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); }
 function saveJournal() {
+  if (typeof upgradeSaveJournal === 'function') { upgradeSaveJournal(); return; }
   var ta = document.querySelectorAll('#pg-journal textarea');
   var filled = 0;
   ta.forEach(function(t){ if (t.value.trim()) filled++; });
@@ -1283,7 +1292,7 @@ function saveJournal() {
 }
 
 // ══ WAR ROOM ══
-function sendW() {
+function legacySendW() {
   var inp = document.getElementById('winput');
   var chat = document.getElementById('wchat');
   if (!inp || !chat || !inp.value.trim()) return;
@@ -1329,8 +1338,12 @@ var dark = (document.documentElement.getAttribute('data-theme') !== 'light');
 function toggleTheme() {
   dark = !dark;
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  try { localStorage.setItem('irfan_os_theme', dark ? 'dark' : 'light'); } catch (e) {}
   var btn = document.getElementById('themeBtn');
   if (btn) btn.innerHTML = dark ? '&#9790;' : '&#9728;';
+  var frame = document.querySelector('.opps-frame');
+  if (frame && frame.contentWindow) frame.contentWindow.postMessage({type:'irfan-os-theme',theme:dark ? 'dark' : 'light'},'*');
+  if (typeof renderAnalytics === 'function' && document.getElementById('pg-analytics').classList.contains('on')) renderAnalytics();
   toast(dark ? '🌙' : '☀️', dark ? 'Dark mode' : 'Light mode', 'c');
 }
 
@@ -1348,7 +1361,19 @@ document.addEventListener('keydown', function(e) {
   var oppPage = document.getElementById('pg-opps');
   if (!oppPage) return;
   oppPage.innerHTML = '<iframe class="opps-frame" src="IRFAN_OS_Opportunities.html?embedded=1" title="IRFAN OS Opportunities"></iframe>';
+  var frame = oppPage.querySelector('.opps-frame');
+  if (frame) frame.addEventListener('load', function(){ if (frame.contentWindow) frame.contentWindow.postMessage({type:'irfan-os-theme',theme:dark ? 'dark' : 'light'},'*'); });
 })();
+
+window.addEventListener('message', function(event){
+  if (!event.data || event.data.type !== 'irfan-os-theme') return;
+  var next = event.data.theme === 'light' ? 'light' : 'dark';
+  if ((dark ? 'dark' : 'light') === next) return;
+  dark = next === 'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  try { localStorage.setItem('irfan_os_theme',next); } catch (e) {}
+  var btn = document.getElementById('themeBtn'); if (btn) btn.innerHTML = dark ? '&#9790;' : '&#9728;';
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // IRFAN OS UPGRADE PACK — analytics, habits, kanban, next actions, war room
@@ -1413,28 +1438,102 @@ var TASKS = [
 ];
 
 (function upgradeLoadTaskState() {
-  var saved = upgradeReadJSON('irfan_os_tasks', {});
-  TASKS.forEach(function(task) {
-    var state = saved[task.id];
-    if (!state) return;
-    if (state.status) task.status = state.status;
-    if (state.dueDate) task.dueDate = state.dueDate;
-    if (state.completedAt !== undefined) task.completedAt = state.completedAt;
+  var saved = upgradeReadJSON('irfan_os_tasks', null);
+  if (Array.isArray(saved) && saved.length) {
+    TASKS = saved.filter(function(task){ return task && task.id && task.title; }).map(function(task){
+      return {id:String(task.id),title:String(task.title),category:task.category || 'Personal',agent:task.agent || 'OWNER',priority:task.priority || 'MED',status:task.status || 'todo',dueDate:task.dueDate || null,completedAt:task.completedAt || null};
+    });
+  } else {
+    TASKS.forEach(function(task) {
+      var state = saved && saved[task.id];
+      if (!state) return;
+      if (state.status) task.status = state.status;
+      if (state.dueDate) task.dueDate = state.dueDate;
+      if (state.completedAt !== undefined) task.completedAt = state.completedAt;
+    });
+  }
+  var seed = upgradeReadJSON('irfan_os_task_seed_v1', null);
+  if (!seed || typeof seed !== 'object' || Array.isArray(seed)) {
+    seed = {};
+    TASKS.forEach(function(task){ seed[task.id] = task.dueDate || null; });
+    upgradeWriteJSON('irfan_os_task_seed_v1', seed);
+  }
+  TASKS.forEach(function(task){
+    if (!saved && seed[task.id]) task.dueDate = seed[task.id];
   });
 })();
 
 function upgradePersistTasks() {
-  var saved = {};
-  TASKS.forEach(function(task) {
-    saved[task.id] = {status:task.status,dueDate:task.dueDate,completedAt:task.completedAt || null};
-  });
-  upgradeWriteJSON('irfan_os_tasks', saved);
+  upgradeWriteJSON('irfan_os_tasks', TASKS.map(function(task){
+    return {id:task.id,title:task.title,category:task.category,agent:task.agent,priority:task.priority,status:task.status,dueDate:task.dueDate || null,completedAt:task.completedAt || null};
+  }));
 }
 
 function upgradeTodayStart() {
   var d = new Date();
   d.setHours(0,0,0,0);
   return d;
+}
+
+function upgradeSetText(id, value) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function upgradeSyncTaskKpis() {
+  var open = TASKS.filter(function(task){ return task.status !== 'done'; }).length;
+  var done = TASKS.filter(function(task){ return task.status === 'done'; }).length;
+  var overdue = TASKS.filter(upgradeIsOverdue).length;
+  upgradeSetText('today-open-count', open);
+  upgradeSetText('today-overdue-count', overdue);
+  upgradeSetText('goal-open-count', open);
+  upgradeSetText('goal-done-count', done);
+  upgradeSetText('goal-overdue-count', overdue);
+  upgradeSetText('kb-open-count', open + ' terbuka');
+  upgradeSetText('kb-overdue-count', overdue + ' overdue');
+  var sidebar = document.querySelector('.si .sb.r');
+  if (sidebar) sidebar.textContent = overdue;
+}
+
+function upgradeMoneyShort(value) {
+  var n = Number(value) || 0;
+  if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID',{maximumFractionDigits:1}) + ' jt';
+  return 'Rp ' + Math.round(n / 1000).toLocaleString('id-ID') + 'k';
+}
+
+function upgradeEmergencyData() {
+  var data = upgradeReadJSON('irfan_os_emergency', {current:3700000,target:15000000,monthly:450000});
+  data = data && typeof data === 'object' ? data : {};
+  return {current:Math.max(0,Number(data.current) || 0),target:Math.max(1,Number(data.target) || 15000000),monthly:Math.max(0,Number(data.monthly) || 0)};
+}
+
+function upgradeRenderEmergency() {
+  var data = upgradeEmergencyData();
+  var pct = Math.min(100, Math.round(data.current / data.target * 100));
+  upgradeSetText('emergency-target-label','Target ' + upgradeMoneyShort(data.target));
+  upgradeSetText('emergency-current',upgradeMoneyShort(data.current));
+  upgradeSetText('emergency-percent',pct + '%');
+  upgradeSetText('emergency-monthly','+' + upgradeMoneyShort(data.monthly) + ' bulan ini');
+  upgradeSetText('emergency-remaining','Sisa ' + upgradeMoneyShort(Math.max(0,data.target-data.current)));
+  var bar = document.getElementById('emergency-progress');
+  if (bar) bar.style.width = pct + '%';
+}
+
+function upgradeEditEmergency() {
+  var data = upgradeEmergencyData();
+  var current = prompt('Saldo dana darurat saat ini (angka rupiah):',String(data.current));
+  if (current === null) return;
+  var target = prompt('Target dana darurat (angka rupiah):',String(data.target));
+  if (target === null) return;
+  var monthly = prompt('Tambahan bulan ini (angka rupiah):',String(data.monthly));
+  if (monthly === null) return;
+  data.current = Math.max(0,Number(String(current).replace(/[^0-9]/g,'')) || 0);
+  data.target = Math.max(1,Number(String(target).replace(/[^0-9]/g,'')) || 15000000);
+  data.monthly = Math.max(0,Number(String(monthly).replace(/[^0-9]/g,'')) || 0);
+  upgradeWriteJSON('irfan_os_emergency',data);
+  upgradeRenderEmergency();
+  upgradeRenderWarRoom();
+  toast('💰','Dana darurat diperbarui','g');
 }
 
 function upgradeIsOverdue(task) {
@@ -1477,6 +1576,8 @@ function upgradeEnsureTodayMarkup() {
 
 function upgradeRenderToday() {
   upgradeEnsureTodayMarkup();
+  upgradeSyncTaskKpis();
+  upgradeRenderEmergency();
   var overdue = TASKS.filter(upgradeIsOverdue);
   var alert = document.getElementById('upgrade-overdue-alert');
   if (alert) {
@@ -1500,7 +1601,8 @@ function upgradeSetTaskStatus(id, status) {
   upgradePersistTasks();
   upgradeRenderToday();
   renderKanban();
-  if (document.getElementById('pg-warroom').classList.contains('on')) upgradeRenderWarRoom();
+  var warPage = document.getElementById('pg-warroom');
+  if (warPage && warPage.classList.contains('on')) upgradeRenderWarRoom();
   toast(status === 'done' ? '✅' : '▶️', status === 'done' ? 'Task selesai' : 'Task dimulai', status === 'done' ? 'g' : 'c');
 }
 
@@ -1630,6 +1732,7 @@ function upgradeAdvanceTask(id) {
 function renderKanban() {
   var bd = document.getElementById('kanban');
   if (!bd) return;
+  upgradeSyncTaskKpis();
   bd.classList.add('upgrade-kanban');
   var filter = document.getElementById('kbfil') ? document.getElementById('kbfil').value : 'all';
   var columns = [
@@ -1669,13 +1772,21 @@ function upgradeEnsureAnalyticsMarkup() {
   }
 }
 
+function upgradeRenderChartFallback(id, config) {
+  var box = document.getElementById(id), data = config && config.data ? config.data : {}, labels = data.labels || [], dataset = data.datasets && data.datasets[0] ? data.datasets[0] : {}, values = dataset.data || [];
+  var numeric = values.map(function(value){ return typeof value === 'object' ? Number(value.y) || 0 : Number(value) || 0; });
+  var max = Math.max.apply(Math,[1].concat(numeric));
+  box.innerHTML = '<div class="upgrade-chart-fallback"><strong>Ringkasan data</strong>' + labels.map(function(label,i){var value=numeric[i] || 0;return '<div class="upgrade-fallback-row"><span>' + upgradeEsc(label) + '</span><span class="upgrade-fallback-track"><span class="upgrade-fallback-fill" style="display:block;width:' + Math.round(value / max * 100) + '%"></span></span><span>' + upgradeEsc(value) + '</span></div>';}).join('') + '</div>';
+}
+
 function upgradeChart(id, config) {
   var box = document.getElementById(id);
   if (!box) return;
   if (upgradeCharts[id]) { try { upgradeCharts[id].destroy(); } catch (e) {} }
   box.classList.add('analytics-chart');
-  if (typeof Chart === 'undefined') { box.innerHTML = '<div style="padding:24px;color:var(--text3);font-size:11px">Chart.js belum termuat. Refresh halaman untuk mencoba lagi.</div>'; return; }
+  if (typeof Chart === 'undefined') { upgradeRenderChartFallback(id,config); return; }
   box.innerHTML = '<canvas></canvas>';
+  box.querySelector('canvas').setAttribute('aria-label','Data ' + id);
   upgradeCharts[id] = new Chart(box.querySelector('canvas').getContext('2d'),config);
 }
 
@@ -1813,6 +1924,84 @@ function upgradeExportWarReport() {
   a.href = url; a.download = 'irfan-os-war-room-' + upgradeDateKey(new Date()) + '.json'; a.click(); URL.revokeObjectURL(url); toast('📊','Status report diunduh','g');
 }
 
+function upgradeJournalEntries() {
+  var entries = upgradeReadJSON('irfan_os_journal_entries', []);
+  return Array.isArray(entries) ? entries : [];
+}
+
+function upgradeLoadJournal() {
+  var latest = upgradeJournalEntries()[0];
+  if (!latest) return;
+  var type = document.getElementById('journal-type');
+  if (type && latest.type) type.value = latest.type;
+  var ta = Array.from(document.querySelectorAll('#pg-journal textarea'));
+  (latest.values || []).forEach(function(value,index){ if (ta[index] && !ta[index].value) ta[index].value = value; });
+  if (latest.mood) Array.from(document.querySelectorAll('#pg-journal .mbtn')).forEach(function(button){if(button.textContent.trim() === latest.mood.trim()) button.classList.add('on');});
+}
+
+function upgradeRenderJournalHistory() {
+  var history = upgradeJournalEntries(), box = document.getElementById('journal-history'), count = document.getElementById('journal-entry-count');
+  if (count) count.textContent = history.length + ' entri';
+  if (!box || !history.length) return;
+  box.innerHTML = history.slice(0,8).map(function(entry){
+    var first = entry.values && entry.values[0] ? entry.values[0] : 'Refleksi tersimpan.';
+    var date = new Date(entry.savedAt || Date.now()).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+    return '<div style="padding:10px 12px;background:var(--bg3);border-radius:var(--rsm);border:1px solid var(--border);margin-bottom:12px;cursor:pointer"><div style="font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:3px">' + upgradeEsc(date) + ' · ' + upgradeEsc(entry.type || 'Harian') + ' · ' + upgradeEsc(entry.mood || '—') + '</div><div style="font-size:11px;color:var(--text2)">' + upgradeEsc(first) + '</div></div>';
+  }).join('');
+}
+
+function upgradeSaveJournal() {
+  var ta = Array.from(document.querySelectorAll('#pg-journal textarea')), filled = ta.filter(function(item){return item.value.trim();}).length;
+  if (!filled) { toast('⚠️','Tulis minimal satu field','y'); return; }
+  var history = upgradeJournalEntries();
+  history.unshift({savedAt:new Date().toISOString(),type:(document.getElementById('journal-type') || {}).value || 'Harian',mood:(document.querySelector('#pg-journal .mbtn.on') || {}).textContent || '',values:ta.map(function(item){return item.value.trim();})});
+  upgradeWriteJSON('irfan_os_journal_entries',history.slice(0,30));
+  upgradeRenderJournalHistory();
+  toast('📝','Refleksi tersimpan di browser','g');
+}
+
+function upgradeRenderWarChat() {
+  var chat = document.getElementById('wchat');
+  if (!chat) return;
+  var messages = upgradeReadJSON('irfan_os_war_chat', null);
+  if (!Array.isArray(messages) || !messages.length) messages = [{from:'OWNER',text:'cari beasiswa perusahaan',time:''},{from:'ATLAS',text:'Rencana aksi: verifikasi tujuan, definisikan langkah evidence-based, lalu tetapkan tenggat.',time:'11 Sep 2026'}];
+  chat.innerHTML = messages.slice(-40).map(function(message){return '<div class="wmsg ' + (message.from === 'OWNER' ? 'own' : 'agt') + '"><div class="wfrom">' + upgradeEsc(message.from) + (message.time ? ' ' + upgradeEsc(message.time) : '') + '</div><div class="wtxt">' + upgradeEsc(message.text) + '</div></div>';}).join('');
+  var count = document.getElementById('war-message-count');
+  if (count) count.textContent = messages.length + ' pesan';
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function sendW(prefill) {
+  var inp = document.getElementById('winput'), text = String(prefill || (inp && inp.value) || '').trim();
+  if (!text) return;
+  var messages = upgradeReadJSON('irfan_os_war_chat', null);
+  if (!Array.isArray(messages) || !messages.length) messages = [{from:'OWNER',text:'cari beasiswa perusahaan',time:''},{from:'ATLAS',text:'Rencana aksi: verifikasi tujuan, definisikan langkah evidence-based, lalu tetapkan tenggat.',time:'11 Sep 2026'}];
+  messages.push({from:'OWNER',text:text,time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+  upgradeWriteJSON('irfan_os_war_chat',messages.slice(-40));
+  if (inp) { inp.value = ''; inp.focus(); }
+  upgradeRenderWarChat();
+  setTimeout(function(){
+    var reply = warR[warIdx % warR.length]; warIdx++;
+    var current = upgradeReadJSON('irfan_os_war_chat', messages);
+    current.push({from:reply[0],text:reply[1],time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+    upgradeWriteJSON('irfan_os_war_chat',current.slice(-40));
+    upgradeRenderWarChat();
+    toast('🤖',reply[0] + ' membalas','g');
+  },900);
+}
+
+function upgradeCreateTaskFromWarRoom() {
+  var title = prompt('Nama task baru:','Tindak lanjuti rekomendasi War Room');
+  if (!title || !title.trim()) return;
+  TASKS.push({id:'task-' + Date.now(),title:title.trim(),category:'Personal',agent:'OWNER',priority:'MED',status:'todo',dueDate:upgradeDateOffset(1,17),completedAt:null});
+  upgradePersistTasks();
+  upgradeSyncTaskKpis();
+  upgradeRenderToday();
+  renderKanban();
+  upgradeRenderWarRoom();
+  toast('✅','Task baru dibuat','g');
+}
+
 // Re-run navigation hooks so each relevant tab refreshes its live state.
 function nav(id, btn) {
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
@@ -1820,6 +2009,7 @@ function nav(id, btn) {
   document.querySelectorAll('.si').forEach(function(s){s.classList.remove('on');});
   var pg = document.getElementById('pg-' + id); if (pg) pg.classList.add('on');
   if (btn) btn.classList.add('on');
+  document.querySelectorAll('.ntab').forEach(function(t){var click=t.getAttribute('onclick')||'';if(click.indexOf("nav('"+id+"'")>=0)t.classList.add('on');});
   document.querySelectorAll('.si').forEach(function(s){var click=s.getAttribute('onclick')||'';if(click.indexOf("nav('"+id+"'")>=0)s.classList.add('on');});
   if (id === 'today') { upgradeRenderToday(); updateHKpi(); }
   if (id === 'goals') { renderGoalChart(); renderHGrid(); updateHKpi(); }
@@ -1827,6 +2017,7 @@ function nav(id, btn) {
   if (id === 'analytics') renderAnalytics();
   if (id === 'career') { renderSkillGap(); setTimeout(function(){renderSkillRadar();},80); }
   if (id === 'warroom') upgradeRenderWarRoom();
+  upgradeSyncTaskKpis();
 }
 
 (function upgradeInit() {
@@ -1834,7 +2025,12 @@ function nav(id, btn) {
   upgradeEnsureAnalyticsMarkup();
   upgradeEnsureWarRoomMarkup();
   renderHGrid(); updateHKpi(); renderHBadges();
+  upgradeLoadJournal();
+  upgradeRenderJournalHistory();
+  upgradeRenderWarChat();
   upgradeRenderToday(); renderKanban(); upgradeRenderWarRoom();
+  upgradeSyncTaskKpis();
+  upgradePersistTasks();
   var lastDate = upgradeDateKey(new Date());
   setInterval(function(){var now=upgradeDateKey(new Date());if(now!==lastDate){lastDate=now;upgradeRenderToday();renderHGrid();updateHKpi();upgradeRenderWarRoom();}},60000);
   document.addEventListener('habitStateChanged',function(){upgradeRenderToday();upgradeRenderWarRoom();});

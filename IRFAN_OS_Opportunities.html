@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IRFAN OS — Opportunities</title>
-<script>if (new URLSearchParams(location.search).get('embedded') === '1') document.documentElement.setAttribute('data-embedded','true');</script>
+<script>
+if (new URLSearchParams(location.search).get('embedded') === '1') document.documentElement.setAttribute('data-embedded','true');
+try { var savedOppTheme = localStorage.getItem('irfan_os_theme'); if (savedOppTheme === 'dark' || savedOppTheme === 'light') document.documentElement.setAttribute('data-theme',savedOppTheme); } catch (e) {}
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 [data-theme="dark"]{
@@ -415,6 +418,7 @@ const DATA = [
 // ══════════════════════════════════════════
 let currentType = 'all';
 let bookmarks   = new Set();
+try { const savedBookmarks = JSON.parse(localStorage.getItem('irfan_os_bookmarks') || '[]'); if (Array.isArray(savedBookmarks)) bookmarks = new Set(savedBookmarks); } catch (e) {}
 
 // ══════════════════════════════════════════
 //  FILTER & RENDER
@@ -494,6 +498,7 @@ function toggleBm(e, id) {
   e.stopPropagation();
   if (bookmarks.has(id)) { bookmarks.delete(id); toast('🔖','Dihapus dari bookmark','cyan'); }
   else                   { bookmarks.add(id);    toast('🔖','Tersimpan!','green'); }
+  try { localStorage.setItem('irfan_os_bookmarks',JSON.stringify(Array.from(bookmarks))); } catch (e) {}
   render();
 }
 
@@ -543,10 +548,20 @@ let isDark = true;
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  try { localStorage.setItem('irfan_os_theme',isDark ? 'dark' : 'light'); } catch (e) {}
+  if (window.parent && window.parent !== window) window.parent.postMessage({type:'irfan-os-theme',theme:isDark ? 'dark' : 'light'},'*');
   document.getElementById('themeBtn').innerHTML = isDark
     ? '<i class="fa-solid fa-moon fa-xs"></i>'
     : '<i class="fa-solid fa-sun fa-xs"></i>';
 }
+
+window.addEventListener('message', function(event){
+  if (!event.data || event.data.type !== 'irfan-os-theme') return;
+  isDark = event.data.theme !== 'light';
+  document.documentElement.setAttribute('data-theme',isDark ? 'dark' : 'light');
+  try { localStorage.setItem('irfan_os_theme',isDark ? 'dark' : 'light'); } catch (e) {}
+  document.getElementById('themeBtn').innerHTML = isDark ? '<i class="fa-solid fa-moon fa-xs"></i>' : '<i class="fa-solid fa-sun fa-xs"></i>';
+});
 
 // ══════════════════════════════════════════
 //  INIT — synchronous only, zero fetch()

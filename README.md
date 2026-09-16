@@ -1,52 +1,45 @@
 # IRFAN OS — Personal Command Center
 
-Personal Operating System berbasis web untuk Irfan Alawi — Geophysicist S2, Bandung.
+Dashboard personal untuk mengelola task, goals, habit, career O&G, peluang geofisika, Journal, Analytics, dan War Room.
 
-🔗 **Live Demo:** https://irfan13alawi-lab.github.io/irfan-os/IRFAN_OS_Dashboard.html
+## Live
 
----
+- VPS: http://43.156.52.203:18086/IRFAN_OS_Dashboard.html
+- Repository: https://github.com/irfan13alawi-lab/my-PA
 
-## 📦 Files
+## Isi proyek
 
-| File | Deskripsi |
-|------|-----------|
-| `IRFAN_OS_Dashboard.html` | Dashboard utama — Today, Goals, Kanban, AI Team, Career O&G, Opportunities, Journal, Analytics, War Room |
-| `IRFAN_OS_Opportunities.html` | Standalone opportunity tracker — beasiswa, kerja, intern geofisika |
+| File | Fungsi |
+|------|--------|
+| `IRFAN_OS_Dashboard.html` | Dashboard utama dan seluruh modul produktivitas |
+| `IRFAN_OS_Opportunities.html` | Tracker peluang publikasi, beasiswa, karier, project, dan kompetisi |
 
----
+## Fitur
 
-## 🚀 Fitur
+- Today dengan fokus task berdasarkan prioritas dan deadline.
+- Habit matrix dengan status kosong, selesai, dan skip.
+- Kanban tiga kolom: To Do, In Progress, dan Done.
+- Analytics task, habit, goals, dan distribusi kategori.
+- War Room dengan status Normal, Alert, Crisis, critical queue, weekly review, dan export report.
+- Journal, bookmark Opportunities, task status, tema, dan review tersimpan di browser.
+- Dashboard Opportunities dapat dibuka sebagai modul gabungan maupun halaman mandiri.
 
-- **Today Dashboard** — Jadwal harian, habit tracker, countdown deadline, dana darurat
-- **Vision & Goals** — 8 goal aktif 2026 dengan radar chart & habit matrix
-- **Kanban Board** — 118 task terbuka, 4 kolom (Next/Review/Done/Blocked)
-- **AI Team** — 9 agent virtual (ATLAS, ARIA, ECHO, LEDGER, NOVA, MIRA, LUMEN, SAGE, PULSE)
-- **Career O&G** — Roadmap 2026–2029, 49 perusahaan global, skill gap analysis
-- **Opportunities** — Beasiswa (SEG, DFG, DAAD, Mitacs), Internship (PHE, SLB), Kompetisi (SEG IMAGE, HAGI)
-- **Journal** — Refleksi harian/mingguan terstruktur
-- **Analytics** — 4 chart (task completion, habit, distribusi, goal progress)
-- **War Room** — Chat dengan AI team
+## Teknologi
 
----
+- Pure HTML, CSS, dan JavaScript tanpa build tool.
+- Highcharts dan Chart.js melalui CDN dengan fallback ringkasan data.
+- `localStorage` untuk penyimpanan local-first.
+- Tidak ada backend atau database aktif di versi ini.
 
-## 🎯 Career Target
+## Update di VPS
 
-Geoscientist / Subsurface Engineer di:
-- **Shell** Graduate Programme (buka Sep 2026)
-- **SLB** NextGen Geoscience (rolling)
-- **ExxonMobil** Geoscientist
-- **Pertamina / PHE** MT & Direct Hire
-- **bp, TotalEnergies, ENI, Equinor** + 40 perusahaan lainnya
+```bash
+cd ~/irfan-os-dashboard
+git pull origin main
+```
 
----
+Server sebaiknya dijalankan sebagai service persistent (systemd) atau di belakang Nginx/Caddy agar otomatis hidup setelah reboot dan dapat memakai HTTPS.
 
-## 🛠️ Tech Stack
+## Catatan privasi
 
-- Pure HTML/CSS/JavaScript — no framework, no build tool
-- Highcharts (bundled via QW vendor) untuk chart
-- Font Awesome icons
-- PostgreSQL backend (via NEXORA Command Center)
-
----
-
-*Built with Amazon Quick · Sat 12 Sep 2026*
+Repository ini berisi data personal dan rencana karier. Pastikan data yang memang ingin dipublikasikan sudah disanitasi sebelum menambahkan file atau informasi baru.
