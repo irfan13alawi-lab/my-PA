@@ -13,6 +13,7 @@ Dashboard personal untuk mengelola task, goals, habit, career O&G, peluang geofi
 |------|--------|
 | `IRFAN_OS_Dashboard.html` | Dashboard utama dan seluruh modul produktivitas |
 | `IRFAN_OS_Opportunities.html` | Tracker peluang publikasi, beasiswa, karier, project, dan kompetisi |
+| `deploy/irfan-os-dashboard.service.example` | Template service VPS agar server otomatis restart |
 
 ## Fitur
 
@@ -38,7 +39,16 @@ cd ~/irfan-os-dashboard
 git pull origin main
 ```
 
-Server sebaiknya dijalankan sebagai service persistent (systemd) atau di belakang Nginx/Caddy agar otomatis hidup setelah reboot dan dapat memakai HTTPS.
+Untuk membuat server persistent di VPS:
+
+```bash
+sudo cp deploy/irfan-os-dashboard.service.example /etc/systemd/system/irfan-os-dashboard.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now irfan-os-dashboard
+sudo systemctl status irfan-os-dashboard
+```
+
+Untuk penggunaan publik jangka panjang, letakkan service di belakang Nginx/Caddy dengan domain dan HTTPS.
 
 ## Catatan privasi
 
