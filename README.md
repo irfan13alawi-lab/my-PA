@@ -69,6 +69,14 @@ IRFAN_AI_API_KEY=isi-key-di-vps
 # opsional: IRFAN_AI_MODEL=gpt-4o-mini
 ```
 
+Pemeriksaan kesehatan VPS tanpa mengubah sistem:
+
+```bash
+bash deploy/vps_health.sh
+```
+
+Jika hasilnya menunjukkan swap hampir penuh, cek proses yang memakai RAM terlebih dahulu dan lakukan maintenance OS setelah backup. Jangan menjalankan upgrade Ubuntu besar-besaran bersamaan dengan migrasi service tanpa jadwal maintenance.
+
 Untuk penggunaan publik jangka panjang, letakkan service di belakang Nginx/Caddy dengan domain dan HTTPS.
 
 ## Catatan privasi
