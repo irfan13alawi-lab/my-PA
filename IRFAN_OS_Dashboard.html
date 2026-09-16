@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IRFAN OS</title>
-<script src="/vendor/highcharts/highcharts.js"></script>
-<script src="/vendor/highcharts/highcharts-more.js"></script>
-<script src="/vendor/highcharts/modules/accessibility.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 [data-theme=dark]{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#1f2436;--card:#161b26;--border:#232b3e;--border2:#2a3348;--text:#e8ecf4;--text2:#9aa3b8;--text3:#5c6680;--shadow:rgba(0,0,0,.5);--topbg:rgba(13,15,20,.96)}
 [data-theme=light]{--bg:#f0f2f7;--bg2:#fff;--bg3:#f5f7fb;--bg4:#eaedf5;--card:#fff;--border:#dde1ed;--border2:#c8cedf;--text:#1a1f2e;--text2:#4a5368;--text3:#8a93aa;--shadow:rgba(0,0,0,.1);--topbg:rgba(240,242,247,.96)}
@@ -64,6 +66,75 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 /* MAIN */
 .main{overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
 .opps-frame{width:100%;height:calc(100vh - 88px);min-height:760px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);display:block}
+.upgrade-alert{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid rgba(255,77,106,.35);border-left:3px solid var(--r);border-radius:var(--rad);background:var(--rd);color:var(--text)}
+.upgrade-alert-copy{display:flex;align-items:center;gap:8px;font-size:12px}
+.upgrade-alert-actions{display:flex;gap:6px;flex-wrap:wrap}
+.upgrade-action{padding:6px 10px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font:600 11px var(--font);transition:all var(--tr)}
+.upgrade-action:hover{border-color:var(--c);color:var(--c)}
+.upgrade-action.primary{background:var(--cd);border-color:rgba(0,212,255,.25);color:var(--c)}
+.upgrade-focus-item{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg3);transition:all var(--tr)}
+.upgrade-focus-item:hover{border-color:var(--border2);transform:translateX(2px)}
+.upgrade-focus-dot{width:8px;height:8px;border-radius:50%;background:var(--c);margin-top:4px;flex-shrink:0;box-shadow:0 0 7px var(--c)}
+.upgrade-focus-body{flex:1;min-width:0}
+.upgrade-focus-title{font-size:12px;line-height:1.4;font-weight:600}
+.upgrade-focus-meta{font:10px var(--mono);color:var(--text3);margin-top:3px}
+.upgrade-focus-meta.late{color:var(--r)}
+.upgrade-focus-actions{display:flex;gap:4px;flex-shrink:0}
+.upgrade-mini{padding:4px 7px;border-radius:4px;border:1px solid var(--border);background:var(--bg4);color:var(--text3);cursor:pointer;font:600 10px var(--font)}
+.upgrade-mini:hover{border-color:var(--c);color:var(--c)}
+.upgrade-mini.done:hover{border-color:var(--g);color:var(--g)}
+.hday.skip{background:rgba(100,100,100,.12);border-color:var(--border2);color:var(--text3)}
+.hday.empty{background:transparent}
+.hday:not(.fut):hover{border-color:var(--c);transform:scale(1.1)}
+.kanban.upgrade-kanban{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:900px){.kanban.upgrade-kanban{grid-template-columns:1fr}}
+.upgrade-kcol{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;min-height:220px;transition:border-color var(--tr),background var(--tr)}
+.upgrade-kcol.dragover{border-color:var(--c);background:var(--cd)}
+.upgrade-khead{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:3px solid var(--col);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--col)}
+.upgrade-khead span:last-child{font:10px var(--mono);padding:2px 7px;border-radius:10px;background:color-mix(in srgb,var(--col) 14%,transparent)}
+.upgrade-kcards{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:170px}
+.upgrade-kcard{position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:10px;cursor:grab;transition:all var(--tr)}
+.upgrade-kcard:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow)}
+.upgrade-kcard.dragging{opacity:.5;border-style:dashed}
+.upgrade-ktitle{font-size:11px;font-weight:600;line-height:1.45;padding-right:22px}
+.upgrade-kmeta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:7px}
+.upgrade-kagent{font:9px var(--mono);font-weight:700;color:var(--c);background:var(--cd);padding:2px 5px;border-radius:3px}
+.upgrade-kdue{font:9px var(--mono);color:var(--text3)}
+.upgrade-kdue.late{color:var(--r)}
+.upgrade-move{position:absolute;right:8px;top:8px;width:22px;height:22px;border:1px solid var(--border);border-radius:4px;background:var(--bg4);color:var(--text3);cursor:pointer;font-weight:700}
+.upgrade-move:hover{border-color:var(--g);color:var(--g)}
+.analytics-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:800px){.analytics-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.analytics-summary{grid-template-columns:1fr}}
+.analytics-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:12px 14px;position:relative;overflow:hidden}
+.analytics-stat::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--ac,var(--c))}
+.analytics-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.analytics-stat-value{font:700 22px var(--mono);color:var(--text);margin-top:5px}
+.analytics-stat-sub{font-size:10px;color:var(--text3);margin-top:3px}
+.analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:700px){.analytics-grid{grid-template-columns:1fr}}
+.analytics-chart{height:220px!important;position:relative}
+.analytics-chart canvas{width:100%!important;height:100%!important}
+.upgrade-war-status{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-left:4px solid var(--status);border-radius:var(--rad);background:linear-gradient(135deg,var(--status-bg),var(--card));transition:all var(--tr)}
+.upgrade-war-status.normal{--status:var(--g);--status-bg:rgba(0,229,160,.1)}
+.upgrade-war-status.alert{--status:var(--y);--status-bg:rgba(255,184,77,.1)}
+.upgrade-war-status.crisis{--status:var(--r);--status-bg:rgba(255,77,106,.1)}
+.upgrade-war-label{font:800 18px var(--mono);color:var(--status);letter-spacing:.08em}
+.upgrade-war-reason{font-size:11px;color:var(--text2);margin-top:3px}
+.upgrade-war-metrics{display:flex;gap:8px;flex-wrap:wrap}
+.upgrade-war-metric{padding:5px 8px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);font:10px var(--mono);color:var(--text2)}
+.upgrade-war-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+@media(max-width:800px){.upgrade-war-grid{grid-template-columns:1fr}}
+.upgrade-critical-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto}
+.upgrade-critical-item{display:flex;align-items:flex-start;gap:8px;padding:8px 9px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg3)}
+.upgrade-critical-item input{margin-top:3px;accent-color:var(--g)}
+.upgrade-critical-kind{font:9px var(--mono);color:var(--r);min-width:52px;text-transform:uppercase}
+.upgrade-critical-title{font-size:11px;font-weight:600;line-height:1.4}
+.upgrade-critical-meta{font-size:10px;color:var(--text3);margin-top:2px}
+.upgrade-review{display:flex;flex-direction:column;gap:7px}
+.upgrade-review label{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);cursor:pointer}
+.upgrade-review input{margin-top:2px;accent-color:var(--g)}
+.upgrade-quick-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .page{display:none;flex-direction:column;gap:14px;animation:fu .2s ease}
 .page.on{display:flex}
 @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1277,6 +1348,496 @@ document.addEventListener('keydown', function(e) {
   var oppPage = document.getElementById('pg-opps');
   if (!oppPage) return;
   oppPage.innerHTML = '<iframe class="opps-frame" src="IRFAN_OS_Opportunities.html?embedded=1" title="IRFAN OS Opportunities"></iframe>';
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IRFAN OS UPGRADE PACK — analytics, habits, kanban, next actions, war room
+// All state remains local-first: no backend or third-party data store required.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function upgradeDateKey(input) {
+  var d = input instanceof Date ? new Date(input) : new Date(input || Date.now());
+  if (isNaN(d.getTime())) return '';
+  return [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+}
+
+function upgradeDateOffset(days, hour) {
+  var d = new Date();
+  d.setHours(hour == null ? 12 : hour, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  return d.toISOString();
+}
+
+function upgradeEsc(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  });
+}
+
+function upgradeGet(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function upgradeSet(key, value) {
+  try {
+    if (value == null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch (e) {}
+}
+
+function upgradeReadJSON(key, fallback) {
+  try {
+    var raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) { return fallback; }
+}
+
+function upgradeWriteJSON(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+// A normalized task model powers Today, Kanban, Analytics, and War Room.
+var TASKS = [
+  {id:'task-finance-review',title:'Finansial: review pemasukan/pengeluaran & dana darurat',category:'Finansial',agent:'LEDGER',priority:'HIGH',status:'todo',dueDate:upgradeDateOffset(-4,16)},
+  {id:'task-gpa-review',title:'Kuliah: review materi & latihan GPA 3.75',category:'Kuliah',agent:'ARIA',priority:'HIGH',status:'todo',dueDate:upgradeDateOffset(-3,18)},
+  {id:'task-manuscript',title:'Karier: manuskrip publikasi — revisi literatur',category:'Karier',agent:'NOVA',priority:'URGENT',status:'in_progress',dueDate:upgradeDateOffset(1,18)},
+  {id:'task-opportunity-review',title:'Evaluasi peluang geofisika & beasiswa',category:'Karier',agent:'ATLAS',priority:'HIGH',status:'in_progress',dueDate:upgradeDateOffset(0,17)},
+  {id:'task-shell',title:'Mulai aplikasi Shell Graduate 2027',category:'Karier',agent:'SAGE',priority:'URGENT',status:'todo',dueDate:upgradeDateOffset(5,23)},
+  {id:'task-petrel',title:'Download Petrel Student Edition dan mulai modul pertama',category:'Akademik',agent:'LUMEN',priority:'HIGH',status:'todo',dueDate:upgradeDateOffset(3,20)},
+  {id:'task-gym',title:'Gym pagi dan recovery',category:'Kesehatan',agent:'MIRA',priority:'MED',status:'todo',dueDate:upgradeDateOffset(0,9)},
+  {id:'task-linkedin',title:'Update LinkedIn headline dan portfolio geofisika',category:'Karier',agent:'SAGE',priority:'MED',status:'todo',dueDate:upgradeDateOffset(7,18)},
+  {id:'task-review-complete',title:'Review mingguan target dan prioritas',category:'Personal',agent:'ECHO',priority:'MED',status:'done',dueDate:upgradeDateOffset(-2,18),completedAt:upgradeDateOffset(-1,19)},
+  {id:'task-english-complete',title:'English technical practice',category:'Personal',agent:'LUMEN',priority:'LOW',status:'done',dueDate:upgradeDateOffset(-1,7),completedAt:upgradeDateOffset(-2,8)},
+  {id:'task-data-complete',title:'Rapikan dataset geofisika untuk portfolio',category:'Akademik',agent:'NOVA',priority:'HIGH',status:'done',dueDate:upgradeDateOffset(-5,18),completedAt:upgradeDateOffset(-3,20)},
+  {id:'task-budget-complete',title:'Catat cashflow dan budgeting mingguan',category:'Finansial',agent:'LEDGER',priority:'MED',status:'done',dueDate:upgradeDateOffset(-6,18),completedAt:upgradeDateOffset(-5,19)}
+];
+
+(function upgradeLoadTaskState() {
+  var saved = upgradeReadJSON('irfan_os_tasks', {});
+  TASKS.forEach(function(task) {
+    var state = saved[task.id];
+    if (!state) return;
+    if (state.status) task.status = state.status;
+    if (state.dueDate) task.dueDate = state.dueDate;
+    if (state.completedAt !== undefined) task.completedAt = state.completedAt;
+  });
+})();
+
+function upgradePersistTasks() {
+  var saved = {};
+  TASKS.forEach(function(task) {
+    saved[task.id] = {status:task.status,dueDate:task.dueDate,completedAt:task.completedAt || null};
+  });
+  upgradeWriteJSON('irfan_os_tasks', saved);
+}
+
+function upgradeTodayStart() {
+  var d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function upgradeIsOverdue(task) {
+  return task.status !== 'done' && task.dueDate && new Date(task.dueDate) < upgradeTodayStart();
+}
+
+function getTopTasks(n) {
+  n = n || 3;
+  var weights = {URGENT:1, HIGH:.7, MED:.4, LOW:.1};
+  var today = upgradeTodayStart();
+  return TASKS.filter(function(task){ return task.status !== 'done'; }).map(function(task) {
+    var due = task.dueDate ? new Date(task.dueDate) : null;
+    var days = due ? Math.ceil((due - today) / 86400000) : 999;
+    var overdueWeight = due && due < today ? 1 : 0;
+    var dueSoonWeight = days <= 3 ? 1 : days <= 7 ? .6 : 0;
+    task._upgradeScore = (weights[task.priority] || .1) * 40 + overdueWeight * 35 + dueSoonWeight * 25;
+    return task;
+  }).sort(function(a,b) {
+    return b._upgradeScore - a._upgradeScore || new Date(a.dueDate || '2999-01-01') - new Date(b.dueDate || '2999-01-01');
+  }).slice(0,n);
+}
+
+function upgradeDueLabel(task) {
+  if (!task.dueDate) return 'Tanpa deadline';
+  var d = new Date(task.dueDate);
+  var label = d.toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+  return upgradeIsOverdue(task) ? '⚠ ' + label + ' · overdue' : label;
+}
+
+function upgradeEnsureTodayMarkup() {
+  var pg = document.getElementById('pg-today');
+  if (!pg) return;
+  if (!document.getElementById('upgrade-overdue-alert')) {
+    var krow = pg.querySelector('.krow');
+    if (krow) krow.insertAdjacentHTML('afterend','<div id="upgrade-overdue-alert"></div>');
+  }
+  var list = pg.querySelector('.tasklist');
+  if (list) list.id = 'focus-now-list';
+}
+
+function upgradeRenderToday() {
+  upgradeEnsureTodayMarkup();
+  var overdue = TASKS.filter(upgradeIsOverdue);
+  var alert = document.getElementById('upgrade-overdue-alert');
+  if (alert) {
+    alert.innerHTML = overdue.length ? '<div class="upgrade-alert"><div class="upgrade-alert-copy">⚠️ <strong>' + overdue.length + ' task overdue</strong> perlu ditriage.</div><div class="upgrade-alert-actions"><button class="upgrade-action" onclick="nav(\'kanban\',null)">Lihat semua</button><button class="upgrade-action primary" onclick="upgradeRescheduleOverdue()">Reschedule otomatis</button></div></div>' : '';
+  }
+  var list = document.getElementById('focus-now-list');
+  if (!list) return;
+  var top = getTopTasks(3);
+  list.innerHTML = top.length ? top.map(function(task) {
+    var late = upgradeIsOverdue(task);
+    var id = upgradeEsc(task.id);
+    return '<div class="upgrade-focus-item"><div class="upgrade-focus-dot"></div><div class="upgrade-focus-body"><div class="upgrade-focus-title">' + upgradeEsc(task.title) + '</div><div class="upgrade-focus-meta ' + (late ? 'late' : '') + '">' + upgradeEsc(task.category) + ' · ' + upgradeEsc(task.agent) + ' · ' + upgradeEsc(upgradeDueLabel(task)) + '</div></div><div class="upgrade-focus-actions"><button class="upgrade-mini" onclick="upgradeSetTaskStatus(\'' + id + '\',\'in_progress\')">Mulai</button><button class="upgrade-mini done" onclick="upgradeSetTaskStatus(\'' + id + '\',\'done\')">Selesai</button></div></div>';
+  }).join('') : '<div style="padding:12px;color:var(--text3);font-size:11px">Tidak ada task terbuka. Good work.</div>';
+}
+
+function upgradeSetTaskStatus(id, status) {
+  var task = TASKS.find(function(item){ return item.id === id; });
+  if (!task) return;
+  task.status = status;
+  task.completedAt = status === 'done' ? new Date().toISOString() : null;
+  upgradePersistTasks();
+  upgradeRenderToday();
+  renderKanban();
+  if (document.getElementById('pg-warroom').classList.contains('on')) upgradeRenderWarRoom();
+  toast(status === 'done' ? '✅' : '▶️', status === 'done' ? 'Task selesai' : 'Task dimulai', status === 'done' ? 'g' : 'c');
+}
+
+function upgradeRescheduleOverdue() {
+  var overdue = TASKS.filter(upgradeIsOverdue);
+  if (!overdue.length) { toast('✅','Tidak ada overdue task','g'); return; }
+  if (!confirm('Geser ' + overdue.length + ' task overdue ke besok?')) return;
+  var tomorrow = upgradeDateOffset(1,17);
+  overdue.forEach(function(task){ task.dueDate = tomorrow; });
+  upgradePersistTasks();
+  upgradeRenderToday();
+  renderKanban();
+  upgradeRenderWarRoom();
+  toast('📅','Overdue task dijadwalkan ulang','g');
+}
+
+// ══ HABIT MATRIX: empty → done → skip → empty ══
+function upgradeWeekDates() {
+  var base = new Date();
+  base.setHours(0,0,0,0);
+  var day = base.getDay();
+  base.setDate(base.getDate() + (day === 0 ? -6 : 1 - day));
+  return Array.from({length:7},function(_,i){ var d = new Date(base); d.setDate(base.getDate()+i); return d; });
+}
+
+function upgradeHabitState(hi, dateKey, dayIndex) {
+  var raw = upgradeGet('habit_' + hi + '_' + dateKey);
+  if (raw === 'done' || raw === 'skip') return raw;
+  var h = habits[hi];
+  return h && dayIndex < 5 && h.days[dayIndex] ? 'done' : null;
+}
+
+function upgradeHabitRate(hi, windowDays) {
+  var done = 0;
+  var total = Math.max(1, windowDays);
+  var now = new Date();
+  for (var i=0; i<windowDays; i++) {
+    var d = new Date(now);
+    d.setDate(now.getDate() - i);
+    var key = upgradeDateKey(d);
+    var week = upgradeWeekDates().map(upgradeDateKey).indexOf(key);
+    if (upgradeHabitState(hi,key,week) === 'done') done++;
+  }
+  return Math.round(done / total * 100);
+}
+
+function renderHGrid() {
+  var el = document.getElementById('hgrid');
+  if (!el) return;
+  var dates = upgradeWeekDates();
+  var days = ['S','S','R','K','J','S','M'];
+  el.innerHTML = habits.map(function(h, hi) {
+    var states = dates.map(function(d,di){ return upgradeHabitState(hi,upgradeDateKey(d),di); });
+    var done = states.filter(function(state){ return state === 'done'; }).length;
+    var pct = Math.round(done / 7 * 100);
+    var dhtml = dates.map(function(d,di) {
+      var dateKey = upgradeDateKey(d), state = states[di];
+      var cls = 'hday ' + (state || 'empty') + (dateKey === upgradeDateKey(new Date()) ? ' today' : '');
+      var label = state === 'done' ? '✓' : state === 'skip' ? '—' : days[di];
+      return '<div class="' + cls + '" role="button" tabindex="0" data-hi="' + hi + '" data-d="' + di + '" data-date="' + dateKey + '" title="' + dateKey + ' · klik untuk ubah" onclick="toggleH(this)" onkeydown="if(event.key===\'Enter\' || event.key===\' \'){event.preventDefault();toggleH(this)}">' + label + '</div>';
+    }).join('');
+    var pctCol = pct >= 70 ? 'var(--g)' : pct >= 40 ? 'var(--y)' : 'var(--r)';
+    return '<div class="hrow"><div class="hname">' + h.e + ' ' + upgradeEsc(h.name) + '</div><div class="hdays">' + dhtml + '</div><div class="hpct" style="color:' + pctCol + '">' + pct + '%</div></div>';
+  }).join('');
+}
+
+function toggleH(el) {
+  var hi = parseInt(el.dataset.hi,10), dateKey = el.dataset.date;
+  var current = upgradeGet('habit_' + hi + '_' + dateKey);
+  if (!current) current = 'empty';
+  var next = current === 'empty' ? 'done' : current === 'done' ? 'skip' : null;
+  upgradeSet('habit_' + hi + '_' + dateKey, next);
+  var week = upgradeWeekDates().map(upgradeDateKey).indexOf(dateKey);
+  if (week >= 0 && week < habits[hi].days.length) habits[hi].days[week] = next === 'done' ? 1 : 0;
+  renderHGrid();
+  updateHKpi();
+  renderHBadges();
+  document.dispatchEvent(new CustomEvent('habitStateChanged',{detail:{habitId:hi,date:dateKey,state:next}}));
+  toast(habits[hi].e, habits[hi].name + (next === 'done' ? ' selesai!' : next === 'skip' ? ' di-skip' : ' dibuka'), next === 'done' ? 'g' : 'x');
+}
+
+function updateHKpi() {
+  var today = upgradeDateKey(new Date()), done = habits.filter(function(_,hi){ return upgradeHabitState(hi,today,upgradeWeekDates().map(upgradeDateKey).indexOf(today)) === 'done'; }).length;
+  var kpi = document.getElementById('hkpi');
+  if (kpi) kpi.innerHTML = done + '<span style="font-size:13px;color:var(--text3)">/9</span>';
+  var pb = document.getElementById('hpbar');
+  if (pb) pb.style.width = Math.round(done / Math.max(1,habits.length) * 100) + '%';
+  renderHBadges(done);
+}
+
+function renderHBadges() {
+  var el = document.getElementById('hbadges');
+  if (!el) return;
+  var today = upgradeDateKey(new Date()), week = upgradeWeekDates().map(upgradeDateKey).indexOf(today);
+  el.innerHTML = habits.map(function(h,hi) {
+    var done = upgradeHabitState(hi,today,week) === 'done';
+    return '<span class="badge ' + (done ? 'bg' : 'bx') + '" style="cursor:pointer" onclick="nav(\'goals\',null)">' + h.e + ' ' + upgradeEsc(h.name.split(' ')[0]) + (done ? ' ✓' : '') + '</span>';
+  }).join('');
+}
+
+// ══ KANBAN: three visual columns + drag/drop ══
+function upgradeDragStart(event, id) {
+  event.dataTransfer.setData('text/plain',id);
+  event.currentTarget.classList.add('dragging');
+}
+
+function upgradeAllowDrop(event, el) {
+  event.preventDefault();
+  el.classList.add('dragover');
+}
+
+function upgradeLeaveDrop(el) { el.classList.remove('dragover'); }
+
+function upgradeDrop(event, status, el) {
+  event.preventDefault();
+  el.classList.remove('dragover');
+  var id = event.dataTransfer.getData('text/plain');
+  upgradeSetTaskStatus(id,status);
+}
+
+function upgradeAdvanceTask(id) {
+  var task = TASKS.find(function(item){ return item.id === id; });
+  if (!task) return;
+  upgradeSetTaskStatus(id, task.status === 'todo' ? 'in_progress' : task.status === 'in_progress' ? 'done' : 'done');
+}
+
+function renderKanban() {
+  var bd = document.getElementById('kanban');
+  if (!bd) return;
+  bd.classList.add('upgrade-kanban');
+  var filter = document.getElementById('kbfil') ? document.getElementById('kbfil').value : 'all';
+  var columns = [
+    {status:'todo',label:'TO DO',col:'var(--text3)'},
+    {status:'in_progress',label:'IN PROGRESS',col:'var(--c)'},
+    {status:'done',label:'DONE',col:'var(--g)'}
+  ];
+  var visible = TASKS.filter(function(task){ return filter === 'all' || task.category === filter; });
+  var open = TASKS.filter(function(task){ return task.status !== 'done'; }).length;
+  var late = TASKS.filter(upgradeIsOverdue).length;
+  var badges = document.querySelectorAll('#pg-kanban > div:first-child .badge');
+  if (badges[0]) badges[0].textContent = open + ' terbuka';
+  if (badges[1]) badges[1].textContent = late + ' overdue';
+  bd.innerHTML = columns.map(function(column) {
+    var cards = visible.filter(function(task){ return task.status === column.status; });
+    return '<section class="upgrade-kcol" ondragover="upgradeAllowDrop(event,this)" ondragleave="upgradeLeaveDrop(this)" ondrop="upgradeDrop(event,\'' + column.status + '\',this)"><div class="upgrade-khead" style="--col:' + column.col + '"><span>' + column.label + '</span><span>' + cards.length + '</span></div><div class="upgrade-kcards">' + (cards.length ? cards.map(function(task) {
+      var id = upgradeEsc(task.id), lateTask = upgradeIsOverdue(task);
+      return '<article class="upgrade-kcard" draggable="true" ondragstart="upgradeDragStart(event,\'' + id + '\')" ondragend="this.classList.remove(\'dragging\')"><button class="upgrade-move" title="Pindah ke kolom berikutnya" onclick="upgradeAdvanceTask(\'' + id + '\')">→</button><div class="upgrade-ktitle">' + upgradeEsc(task.title) + '</div><div class="upgrade-kmeta"><span class="upgrade-kagent">' + upgradeEsc(task.agent) + '</span><span class="badge bx" style="font-size:9px">' + upgradeEsc(task.category) + '</span><span class="upgrade-kdue ' + (lateTask ? 'late' : '') + '">' + upgradeEsc(upgradeDueLabel(task)) + '</span></div></article>';
+    }).join('') : '<div style="padding:14px;font-size:11px;color:var(--text3);text-align:center">Tidak ada task</div>') + '</div></section>';
+  }).join('');
+}
+
+// ══ ANALYTICS: Chart.js + data-driven summary ══
+var upgradeCharts = {};
+
+function upgradeEnsureAnalyticsMarkup() {
+  var pg = document.getElementById('pg-analytics');
+  if (!pg) return;
+  var grid = pg.querySelector('.g2');
+  if (grid) grid.classList.add('analytics-grid');
+  if (!document.getElementById('analytics-summary')) {
+    var summary = document.createElement('div');
+    summary.id = 'analytics-summary';
+    summary.className = 'analytics-summary';
+    summary.innerHTML = '<div class="analytics-stat" style="--ac:var(--g)"><div class="analytics-stat-label">Tasks selesai minggu ini</div><div class="analytics-stat-value" id="a-tasks-week">—</div><div class="analytics-stat-sub">berdasarkan completedAt</div></div><div class="analytics-stat" style="--ac:var(--c)"><div class="analytics-stat-label">Habit rate minggu ini</div><div class="analytics-stat-value" id="a-habit-rate">—</div><div class="analytics-stat-sub">localStorage habit logs</div></div><div class="analytics-stat" style="--ac:var(--p)"><div class="analytics-stat-label">Goals on track</div><div class="analytics-stat-value" id="a-goals-track">—</div><div class="analytics-stat-sub">progress ≥ 50% atau bergerak</div></div><div class="analytics-stat" style="--ac:var(--y)"><div class="analytics-stat-label">Streak terpanjang</div><div class="analytics-stat-value" id="a-streak">—</div><div class="analytics-stat-sub">hari berturut-turut</div></div>';
+    pg.insertBefore(summary,grid || pg.firstChild);
+  }
+}
+
+function upgradeChart(id, config) {
+  var box = document.getElementById(id);
+  if (!box) return;
+  if (upgradeCharts[id]) { try { upgradeCharts[id].destroy(); } catch (e) {} }
+  box.classList.add('analytics-chart');
+  if (typeof Chart === 'undefined') { box.innerHTML = '<div style="padding:24px;color:var(--text3);font-size:11px">Chart.js belum termuat. Refresh halaman untuk mencoba lagi.</div>'; return; }
+  box.innerHTML = '<canvas></canvas>';
+  upgradeCharts[id] = new Chart(box.querySelector('canvas').getContext('2d'),config);
+}
+
+function upgradeLastSevenDays() {
+  var labels = [], keys = [];
+  var short = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  for (var i=6; i>=0; i--) {
+    var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
+    labels.push(short[d.getDay()]); keys.push(upgradeDateKey(d));
+  }
+  return {labels:labels,keys:keys};
+}
+
+function upgradeTasksDoneThisWeek() {
+  var cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-6);
+  return TASKS.filter(function(task){ return task.completedAt && new Date(task.completedAt) >= cutoff; }).length;
+}
+
+function upgradeGoalsOnTrack() {
+  return goals.filter(function(goal){ return goal.pct >= 50 || (goal.pct > 0 && goal.pri !== 'URGENT'); }).length;
+}
+
+function upgradeLongestStreak() {
+  var longest = 0;
+  habits.forEach(function(_,hi) {
+    var streak = 0;
+    for (var i=29; i>=0; i--) {
+      var d = new Date(); d.setDate(d.getDate()-i);
+      if (upgradeHabitState(hi,upgradeDateKey(d),-1) === 'done') { streak++; longest = Math.max(longest,streak); }
+      else streak = 0;
+    }
+  });
+  return longest;
+}
+
+function upgradeAverageHabitRate(days) {
+  if (!habits.length) return 0;
+  return Math.round(habits.reduce(function(sum,_,hi){ return sum + upgradeHabitRate(hi,days); },0) / habits.length);
+}
+
+function renderAnalytics() {
+  upgradeEnsureAnalyticsMarkup();
+  var darkMode = document.documentElement.getAttribute('data-theme') !== 'light';
+  var text = darkMode ? '#9aa3b8' : '#4a5368';
+  var grid = darkMode ? '#232b3e' : '#dde1ed';
+  var days = upgradeLastSevenDays();
+  var taskData = days.keys.map(function(key){ return TASKS.filter(function(task){ return task.completedAt && upgradeDateKey(task.completedAt) === key; }).length; });
+  var common = {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:text,font:{size:10}}},tooltip:{backgroundColor:darkMode?'#161b26':'#fff',titleColor:darkMode?'#e8ecf4':'#1a1f2e',bodyColor:darkMode?'#e8ecf4':'#1a1f2e'}},scales:{x:{ticks:{color:text,font:{size:10}},grid:{color:grid}},y:{beginAtZero:true,ticks:{color:text,font:{size:10}},grid:{color:grid}}}};
+  upgradeChart('ch-tasks',{type:'line',data:{labels:days.labels,datasets:[{label:'Selesai',data:taskData,borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.1)',fill:true,tension:.35,pointRadius:3}]},options:common});
+  var radarOptions = {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:text,font:{size:10}}}},scales:{r:{min:0,max:100,angleLines:{color:grid},grid:{color:grid},pointLabels:{color:text,font:{size:10}},ticks:{color:text,backdropColor:'transparent',font:{size:9}}}}};
+  upgradeChart('ch-goals2',{type:'radar',data:{labels:goals.map(function(g){return g.name.replace(/^\S+\s/,'');}),datasets:[{label:'Progress',data:goals.map(function(g){return g.pct;}),borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.2)',pointBackgroundColor:'#00ff88'}]},options:radarOptions});
+  var habitLabels = habits.map(function(h){return h.e + ' ' + h.name;});
+  var habitData = habits.map(function(_,hi){return upgradeHabitRate(hi,30);});
+  upgradeChart('ch-habits',{type:'bar',data:{labels:habitLabels,datasets:[{label:'Rate %',data:habitData,backgroundColor:habitData.map(function(v){return v>=70?'#00e5a0':v>=40?'#ffb84d':'#ff4d6a';}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:0,max:100,ticks:{color:text,font:{size:10},callback:function(v){return v+'%'}},grid:{color:grid}},y:{ticks:{color:text,font:{size:10}},grid:{display:false}}}}});
+  var categories = {};
+  TASKS.forEach(function(task){ categories[task.category] = (categories[task.category] || 0) + 1; });
+  upgradeChart('ch-cats',{type:'doughnut',data:{labels:Object.keys(categories),datasets:[{data:Object.keys(categories).map(function(k){return categories[k];}),backgroundColor:['#00d4ff','#00e5a0','#9b7cff','#ff4d6a','#ffb84d','#ff7c4d'],borderColor:darkMode?'#0d0f14':'#f0f2f7',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:text,font:{size:10},boxWidth:10}}}}});
+  var weekRate = upgradeAverageHabitRate(7);
+  var tasksEl = document.getElementById('a-tasks-week'), habitEl = document.getElementById('a-habit-rate'), goalEl = document.getElementById('a-goals-track'), streakEl = document.getElementById('a-streak');
+  if (tasksEl) tasksEl.textContent = upgradeTasksDoneThisWeek();
+  if (habitEl) habitEl.textContent = weekRate + '%';
+  if (goalEl) goalEl.textContent = upgradeGoalsOnTrack() + '/' + goals.length;
+  if (streakEl) streakEl.textContent = upgradeLongestStreak();
+}
+
+// ══ WAR ROOM: status, critical queue, quick actions, weekly review ══
+function upgradeReviewKey() {
+  var dates = upgradeWeekDates();
+  return 'war_review_' + upgradeDateKey(dates[0]);
+}
+
+function upgradeWarStatus() {
+  var overdue = TASKS.filter(upgradeIsOverdue).length;
+  var habitRate = upgradeAverageHabitRate(7);
+  var urgentZero = goals.some(function(goal){ return goal.pct === 0 && (goal.pri === 'URGENT' || goal.pri === 'HIGH'); });
+  var level = overdue > 15 || urgentZero ? 'crisis' : overdue >= 5 || habitRate < 70 ? 'alert' : 'normal';
+  var reason = level === 'crisis' ? (urgentZero ? 'Ada goal prioritas tinggi dengan progress 0%.' : overdue + ' task overdue.') : level === 'alert' ? 'Perlu triage task dan habit minggu ini.' : 'Semua indikator utama masih terkendali.';
+  return {level:level,overdue:overdue,habitRate:habitRate,urgentZero:urgentZero,reason:reason};
+}
+
+function upgradeCriticalItems() {
+  var items = [];
+  TASKS.filter(upgradeIsOverdue).sort(function(a,b){return new Date(a.dueDate)-new Date(b.dueDate);}).forEach(function(task){items.push({kind:'TASK',title:task.title,meta:upgradeDueLabel(task)+' · '+task.agent,id:task.id});});
+  goals.filter(function(goal){return goal.pct === 0 && (goal.pri === 'URGENT' || goal.pri === 'HIGH');}).forEach(function(goal){items.push({kind:'GOAL',title:goal.name,meta:goal.pri+' · progress 0%'});});
+  habits.forEach(function(h,hi){var rate=upgradeHabitRate(hi,30);if(rate<40)items.push({kind:'HABIT',title:h.name,meta:'rate 30 hari '+rate+'%'});});
+  deadlines.filter(function(d){var diff=(d.dt-new Date())/86400000;return diff>=0&&diff<=7;}).forEach(function(d){items.push({kind:'DEADLINE',title:d.lbl,meta:d.dt.toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});});
+  return items;
+}
+
+function upgradeEnsureWarRoomMarkup() {
+  var pg = document.getElementById('pg-warroom');
+  if (!pg || document.getElementById('upgrade-war-status')) return;
+  pg.insertAdjacentHTML('afterbegin','<div id="upgrade-war-status" class="upgrade-war-status normal"><div><div class="upgrade-war-label" id="upgrade-war-label">NORMAL</div><div class="upgrade-war-reason" id="upgrade-war-reason"></div></div><div class="upgrade-war-metrics"><span class="upgrade-war-metric" id="upgrade-war-overdue"></span><span class="upgrade-war-metric" id="upgrade-war-habit"></span><span class="upgrade-war-metric" id="upgrade-war-goal"></span></div></div><div class="upgrade-war-grid"><div class="card"><div class="ch"><div class="ct">⚠️ CRITICAL ITEMS</div><span class="badge br" id="upgrade-critical-count">0</span></div><div class="cb"><div class="upgrade-critical-list" id="upgrade-critical-list"></div><div class="upgrade-quick-actions"><button class="upgrade-action" onclick="upgradeRescheduleOverdue()">📅 Reschedule overdue</button><button class="upgrade-action" onclick="upgradeBatchComplete()">✅ Batch complete</button><button class="upgrade-action" onclick="upgradeExportWarReport()">📊 Export report</button></div></div></div><div class="card"><div class="ch"><div class="ct">✅ WEEKLY REVIEW</div><span style="font-size:10px;color:var(--text3)" id="upgrade-review-week"></span></div><div class="cb"><div class="upgrade-review" id="upgrade-review-list"></div></div></div></div>');
+}
+
+function upgradeRenderWarRoom() {
+  upgradeEnsureWarRoomMarkup();
+  var status = upgradeWarStatus(), panel = document.getElementById('upgrade-war-status');
+  if (!panel) return;
+  panel.className = 'upgrade-war-status ' + status.level;
+  document.getElementById('upgrade-war-label').textContent = status.level.toUpperCase();
+  document.getElementById('upgrade-war-reason').textContent = status.reason;
+  document.getElementById('upgrade-war-overdue').textContent = status.overdue + ' overdue';
+  document.getElementById('upgrade-war-habit').textContent = 'habit ' + status.habitRate + '%';
+  document.getElementById('upgrade-war-goal').textContent = status.urgentZero ? 'goal urgent 0%' : 'goals stabil';
+  var items = upgradeCriticalItems(), list = document.getElementById('upgrade-critical-list'), count = document.getElementById('upgrade-critical-count');
+  if (count) count.textContent = items.length;
+  if (list) list.innerHTML = items.length ? items.map(function(item){
+    var check = item.id ? '<input class="war-check" type="checkbox" data-id="' + upgradeEsc(item.id) + '">' : '';
+    return '<label class="upgrade-critical-item">' + check + '<div><div><span class="upgrade-critical-kind">' + item.kind + '</span><span class="upgrade-critical-title">' + upgradeEsc(item.title) + '</span></div><div class="upgrade-critical-meta">' + upgradeEsc(item.meta) + '</div></div></label>';
+  }).join('') : '<div style="padding:16px;text-align:center;color:var(--text3);font-size:11px">Tidak ada item kritis.</div>';
+  var review = upgradeReadJSON(upgradeReviewKey(), {}), reviewList = document.getElementById('upgrade-review-list'), reviewWeek = document.getElementById('upgrade-review-week');
+  if (reviewWeek) reviewWeek.textContent = upgradeDateKey(upgradeWeekDates()[0]);
+  if (reviewList) {
+    var checks = ['Review semua goal progress','Reschedule task overdue','Set priorities untuk minggu depan','Evaluate habit yang tidak jalan','Update dana darurat progress'];
+    reviewList.innerHTML = checks.map(function(label,i){return '<label><input type="checkbox" ' + (review[i] ? 'checked' : '') + ' onchange="upgradeToggleReview(' + i + ',this.checked)"><span>' + label + '</span></label>';}).join('');
+  }
+}
+
+function upgradeToggleReview(index, checked) {
+  var review = upgradeReadJSON(upgradeReviewKey(), {}); review[index] = checked; upgradeWriteJSON(upgradeReviewKey(),review);
+}
+
+function upgradeBatchComplete() {
+  var selected = Array.from(document.querySelectorAll('#upgrade-critical-list .war-check:checked')).map(function(el){return el.dataset.id;});
+  if (!selected.length) { toast('☑️','Pilih task di Critical Items dulu','y'); return; }
+  selected.forEach(function(id){ upgradeSetTaskStatus(id,'done'); });
+  upgradeRenderWarRoom();
+  toast('✅',selected.length + ' task diselesaikan','g');
+}
+
+function upgradeExportWarReport() {
+  var status = upgradeWarStatus(), report = {generatedAt:new Date().toISOString(),status:status,overdue:TASKS.filter(upgradeIsOverdue),goals:goals,habitRates:habits.map(function(h,hi){return {name:h.name,rate:upgradeHabitRate(hi,30)};})};
+  var blob = new Blob([JSON.stringify(report,null,2)],{type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = 'irfan-os-war-room-' + upgradeDateKey(new Date()) + '.json'; a.click(); URL.revokeObjectURL(url); toast('📊','Status report diunduh','g');
+}
+
+// Re-run navigation hooks so each relevant tab refreshes its live state.
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.si').forEach(function(s){s.classList.remove('on');});
+  var pg = document.getElementById('pg-' + id); if (pg) pg.classList.add('on');
+  if (btn) btn.classList.add('on');
+  document.querySelectorAll('.si').forEach(function(s){var click=s.getAttribute('onclick')||'';if(click.indexOf("nav('"+id+"'")>=0)s.classList.add('on');});
+  if (id === 'today') { upgradeRenderToday(); updateHKpi(); }
+  if (id === 'goals') { renderGoalChart(); renderHGrid(); updateHKpi(); }
+  if (id === 'kanban') renderKanban();
+  if (id === 'analytics') renderAnalytics();
+  if (id === 'career') { renderSkillGap(); setTimeout(function(){renderSkillRadar();},80); }
+  if (id === 'warroom') upgradeRenderWarRoom();
+}
+
+(function upgradeInit() {
+  upgradeEnsureTodayMarkup();
+  upgradeEnsureAnalyticsMarkup();
+  upgradeEnsureWarRoomMarkup();
+  renderHGrid(); updateHKpi(); renderHBadges();
+  upgradeRenderToday(); renderKanban(); upgradeRenderWarRoom();
+  var lastDate = upgradeDateKey(new Date());
+  setInterval(function(){var now=upgradeDateKey(new Date());if(now!==lastDate){lastDate=now;upgradeRenderToday();renderHGrid();updateHKpi();upgradeRenderWarRoom();}},60000);
+  document.addEventListener('habitStateChanged',function(){upgradeRenderToday();upgradeRenderWarRoom();});
 })();
 </script>
 </body>
