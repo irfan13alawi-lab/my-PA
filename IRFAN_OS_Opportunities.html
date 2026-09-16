@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IRFAN OS — Opportunities</title>
+<script>if (new URLSearchParams(location.search).get('embedded') === '1') document.documentElement.setAttribute('data-embedded','true');</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 [data-theme="dark"]{
@@ -42,6 +43,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .icon-btn:hover{border-color:var(--cyan);color:var(--cyan);}
 
 .main{max-width:1160px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+html[data-embedded="true"] .topbar{display:none;}
+html[data-embedded="true"] .main{max-width:none;padding:0;}
 
 /* stats */
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}

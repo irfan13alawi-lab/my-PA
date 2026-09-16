@@ -63,6 +63,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
 /* MAIN */
 .main{overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.opps-frame{width:100%;height:calc(100vh - 88px);min-height:760px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);display:block}
 .page{display:none;flex-direction:column;gap:14px;animation:fu .2s ease}
 .page.on{display:flex}
 @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1270,6 +1271,13 @@ function toggleNotif() { notifOpen = !notifOpen; toast('🔔', notifOpen ? '3 no
 document.addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); toast('🔍','Search: ketik di atas','c'); }
 });
+
+// ══ EMBEDDED OPPORTUNITIES ══
+(function() {
+  var oppPage = document.getElementById('pg-opps');
+  if (!oppPage) return;
+  oppPage.innerHTML = '<iframe class="opps-frame" src="IRFAN_OS_Opportunities.html?embedded=1" title="IRFAN OS Opportunities"></iframe>';
+})();
 </script>
 </body>
 </html>
